@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Scene>
+    <Source type="VTKXMLFileReader" file="events_repositioned.xml">
+        <ModuleManager name="MYMANAGER">
+            <scalar_lut_manager lut_mode="RdYlBu"/>
+            <Module type="Glyph" name="MyGlyph">
+                    <glyph scale_factor="20"/>
+            </Module>
+        </ModuleManager>
+    </Source>
+    <Source type="VTKXMLFileReader" file="stations.xml">
+        <ModuleManager name="MYMANAGER">
+            <scalar_lut_manager lut_mode="RdYlBu" visible="0"/>
+            <Module type="Glyph" name="MyGlyph">
+                    <glyph scale_factor="20"/>
+            </Module>
+        </ModuleManager>
+    </Source>
+    <Source type="VTKXMLFileReader" file="stations.xml">
+        <ModuleManager name="MYMANAGER">
+            <scalar_lut_manager lut_mode="RdYlBu" visible="0"/>
+            <Module type="Glyph" name="MyGlyph">
+                    <glyph scale_factor="20"/>
+            </Module>
+        </ModuleManager>
+    </Source>
+</Scene>

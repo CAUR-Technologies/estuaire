@@ -1,0 +1,14 @@
+--- data.py
++++ data.py
+@@ -41,9 +41,9 @@
+         try:
+             for tname, ttype in tt_dtype:
+                 data[tname]
+-            self.data = data
++            data = data.astype(self.dtype)
+         except ValueError, e:
+-            self.data = np.asarray(data, dtype = self.dtype)
++            data = np.asarray(data, dtype = self.dtype)
+ 
+         self.data               = data
+         self.data.dtype         = self.dtype

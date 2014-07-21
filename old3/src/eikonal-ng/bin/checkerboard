@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+# @Author : Jean-Pascal Mercier <jean-pascal.mercier@agsis.com>
+#
+# @Copyright (C) 2010 Jean-Pascal Mercier
+#
+# All rights reserved.
+#
+#
+#
+__doc__ = """
+This script is the CLI interface for the generation of a checkerboard pattern
+for resolution analysis in a tomographic inversion. This normally used in
+conjonction with the set of rays extracted from a raytracing algorithm in the
+last obtain velocity model.
+"""
+
+import math
+import numpy as np
+import scipy as sc
+import scipy.ndimage
+import itertools
+
+import eikonal.data
+
+def checkerboard(shape, spacing, sigma, bgvel, percvel = 0.1, origin = None):
+    """
+    :param shape: The shape of the grid to be generated
+    :param spacing: The spacing of the grid
+    :param sigma: The standard deviation of the gaussian used to generate \
+            the pattern
+    :param bgvel: The background velocity of the grid grid
+    :param percvel: The variation of the velocity throught the checkerboard in \
+            percent of the original background velocity
+
+    :return: An EKImageData representing the underlying grid
+    """
+
+    # Parameters verification
+    if (percvel < 0) or (percvel > 1):
+        raise ValueError("percvel argument is a percentage" \
+                         "it must lie between 0 and 1")
+    if (bgvel < 0):
+        raise ValueError("bgvel must be positive")
+
+    if (sigma < (spacing)):
+        raise ValueError("Sigma must cover at least 2 grid element for a" \
+                         "correct checkerboard pattern to arrise")
+
+    if origin is not None:
+        origin = map(float, origin.strip('"').split(","))
+
+    shape = map(int, shape.split(","))
+    coord = np.indices(shape)*spacing
+
+    sigma = sigma / spacing
+
+    # ensuring that the spheroid falls on grid points.
+    ngauss = [max(1, math.floor(s / (2 * sigma))) for s in shape]
+    ngauss = [s + 3 if (s % 2 == 0) else s + 2 for s in ngauss]
+
+    checkboard = np.zeros([math.ceil(s * 2 * sigma) for s in ngauss])
+    ranges = [np.linspace(sigma , s - sigma, g) for s, g in zip(checkboard.shape, ngauss)]
+    for i, pos in enumerate(itertools.product(*ranges)):
+        checkboard.__setitem__(pos, (-1) ** i)
+
+    B = sc.ndimage.gaussian_filter(checkboard, sigma = sigma , mode = 'mirror')
+    B = B.__getitem__(tuple([slice(sigma * 2, s + sigma * 2) for s in shape]))
+    B = bgvel + B * ((bgvel * percvel * 2) / (B.max() - B.min()))
+
+    return eikonal.data.EKImageData(B, origin = origin, spacing = spacing)
+
+if __name__ == '__main__':
+    import agstd.main as main
+    main.main(checkerboard, spacing = float, sigma = float, bgvel = float, percvel = float)
+
+
+

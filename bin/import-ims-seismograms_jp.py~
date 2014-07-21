@@ -1,0 +1,7 @@
+import table
+import numpy as np
+import sys
+
+print sys.argc[0]
+
+

@@ -1,0 +1,191 @@
+#!/usr/bin/env python
+import sys
+
+import numpy as np
+import scipy as sc
+import scipy.optimize
+
+import agstd.sdb.dbase as sdb
+import agstd.log
+
+import logging
+log = logging.root
+log.setLevel(logging.DEBUG)
+
+def average(sta_S, sta_P, trg_S, trg_P, evt):
+    if len(sta_S) + len(sta_P) < 5:
+        return evt['orig_X'], evt['orig_Y'], evt['orig_Z'], np.nan, np.inf, len(sta_S), len(sta_P), True, "Underconstrained"
+    if len(sta_P) < 3:
+        return evt['orig_X'], evt['orig_Y'], evt['orig_Z'], np.nan, np.inf, len(sta_S), len(sta_P), True, "Not Enough P-Wave pick"
+
+    if len(sta_S) != 0:
+        atime_S = np.sqrt((sta_S['X'] - evt['orig_X']) ** 2 +\
+                          (sta_S['Y'] - evt['orig_Y']) ** 2 +\
+                          (sta_S['Z'] - evt['orig_Z']) ** 2) / trg_S['velocity']
+        etime_S = trg_S['time'] - atime_S
+    else:
+        etime_S = []
+
+    if len(sta_P) != 0:
+        atime_P = np.sqrt((sta_P['X'] - evt['orig_X']) ** 2 +\
+                          (sta_P['Y'] - evt['orig_Y']) ** 2 +\
+                          (sta_P['Z'] - evt['orig_Z']) ** 2) / trg_P['velocity']
+        etime_P = trg_P['time'] - atime_P
+    else:
+        etime_P = []
+
+
+    t0 = np.average(np.concatenate([etime_P, etime_S]))
+
+    if len(sta_P) != 0:
+        tt_P = trg_P['time'] - t0
+        RP = np.sum(np.abs(atime_P - tt_P))
+    else:
+        RP = 0
+
+    if len(sta_S) != 0:
+        tt_S = trg_S['time'] - t0
+        RS = np.sum(np.abs(atime_S - tt_S))
+    else:
+        RS = 0
+
+
+    R = (RS + RP) / (len(sta_S) + len(sta_P))
+    return evt['orig_X'], evt['orig_Y'], evt['orig_Z'], t0, R, len(sta_S), len(sta_P), False, ""
+
+def simplex(sta_S, sta_P, trg_S, trg_P, evt):
+    if len(sta_P) < 3:
+        return evt['orig_X'], evt['orig_Y'], evt['orig_Z'], np.nan, np.inf, len(sta_S), len(sta_P), True, "Not Enough P-Wave pick"
+
+    if  len(sta_P) + len(sta_S) < 5:
+        return evt['orig_X'], evt['orig_Y'], evt['orig_Z'], np.nan, np.inf, len(sta_S), len(sta_P), True, "Highly Underconstrained"
+
+    X0 = np.array(average(sta_S, sta_P, trg_S, trg_P, evt)[:4])
+
+    if len(sta_S) > 0:
+        Vs = trg_S['velocity']
+        Ts = trg_S['time']
+        Xs = sta_S['X']
+        Ys = sta_S['Y']
+        Zs = sta_S['Z']
+    else:
+        Vs = Ts = Xs = Ys = Zs = []
+
+    if len(sta_P) > 0:
+        Vp = trg_P['velocity']
+        Tp = trg_P['time']
+        Xp = sta_P['X']
+        Yp = sta_P['Y']
+        Zp = sta_P['Z']
+    else:
+        Vp = Tp = Xp = Yp = Zp = []
+
+    X = np.concatenate([Xs, Xp])
+    Y = np.concatenate([Ys, Yp])
+    Z = np.concatenate([Zs, Zp])
+    V = np.concatenate([Vs, Vp])
+    T = np.concatenate([Ts, Tp])
+
+
+    def toOptimize(C):
+        x, y, z, t = C
+        TT1 = np.sqrt((X - x) ** 2 + (Y - y) ** 2 + (Z - z) ** 2) / V
+        TT2 = T - t
+
+        R = np.sum(np.abs(TT1 - TT2))
+
+        return R
+
+
+    O, fopt, i, fcalls, wflag = sc.optimize.fmin(toOptimize, X0, disp = False, full_output = True, maxfun = 1000, maxiter = 1000)
+    print toOptimize(X0), toOptimize(O)
+    message = "" if not wflag else "Warning : Simplex Optimization did not converge ... entirely"
+    R = toOptimize(O) / len(X)
+    return O[0], O[1], O[2], O[3], R, len(sta_S), len(sta_P), False, ""
+
+def original(sta_S, sta_P, trg_S, trg_P, evt):
+    return evt['orig_X'], evt['orig_Y'], evt['orig_Z'], evt['orig_time'], 0, len(sta_S), len(sta_P), False, ""
+
+
+
+if __name__ == '__main__':
+    dbfile = sys.argv[1]
+    group = sys.argv[2]
+    print dbfile, group
+
+    db = sdb.SeismicHDF5DB(dbfile, group, mode = 'a', sanity_check = False)
+    db.sort_trigger(keys = ['event_id', 'station_id'])
+
+    evtids = np.arange(db.root.events.nrows)
+
+
+    log.info("     --> Initializing Structures ...")
+    sys.stdout.flush()
+
+    triggers = db.root.triggers.description.read()
+    pick_table = db.root.triggers.pick.read()
+    triggers_P = pick_table[pick_table['pick_type'] == sdb.pick_type.P_Wave]
+    triggers_S = pick_table[pick_table['pick_type'] == sdb.pick_type.S_Wave]
+
+    desc_P = triggers[triggers_P['trigger_id']]
+    desc_S = triggers[triggers_S['trigger_id']]
+
+
+    split_ind = np.searchsorted(triggers[pick_table['trigger_id']]['event_id'], evtids, side = 'right')
+
+    split_ind_S = np.searchsorted(desc_S['event_id'], evtids, side = 'right')
+    split_ind_P = np.searchsorted(desc_P['event_id'], evtids, side = 'right')
+
+    evt = db.root.events.read()
+
+    split_sta_S = np.split(db.root.stations.read()[desc_S['station_id']], split_ind_S)
+    split_sta_P = np.split(db.root.stations.read()[desc_P['station_id']], split_ind_P)
+
+    split_trg_S = np.split(triggers_S, split_ind_S)
+    split_trg_P = np.split(triggers_P, split_ind_P)
+
+    split_trg = np.split(pick_table, split_ind)
+
+    log.info("     --> Updating Original Table ...")
+    oevents = [original(*args) for args in zip(split_sta_S, split_sta_P, split_trg_S, split_trg_P, evt)]
+    catalog = db.new_catalog("original", override = True)
+    catalog.events.append(oevents)
+    catalog.events.flush()
+    for cevt, trg in zip(catalog.events.read(), split_trg):
+        if len(trg) != 0:
+            traveltimes = trg['time'] - cevt['time']
+            catalog.traveltimes.append(traveltimes)
+    catalog.traveltimes.flush()
+
+    log.info("     --> Calculating Average ...")
+    acevents = [average(*args) for args in zip(split_sta_S, split_sta_P, split_trg_S, split_trg_P, evt)]
+    print acevents
+    log.info("     --> Updating Average Tables ...")
+
+    catalog = db.new_catalog("average", override = True)
+    catalog.events.append(acevents)
+    catalog.events.flush()
+
+    for cevt, trg in zip(catalog.events.read(), split_trg):
+        if len(trg) != 0:
+            traveltimes = trg['time'] - cevt['time']
+            catalog.traveltimes.append(traveltimes)
+    catalog.traveltimes.flush()
+
+    log.info("     --> Calculating Simplex ...")
+    scevents = [simplex(*args) for args in zip(split_sta_S, split_sta_P, split_trg_S, split_trg_P, evt)]
+    log.info("     --> Updating Simplex Tables ...")
+
+    catalog = db.new_catalog("simplex", override = True)
+    catalog.events.append(scevents)
+    catalog.events.flush()
+
+    for cevt, trg in zip(catalog.events.read(), split_trg):
+        if len(trg) != 0:
+            traveltimes = trg['time'] - cevt['time']
+            catalog.traveltimes.append(traveltimes)
+
+    catalog.traveltimes.flush()
+
+
+

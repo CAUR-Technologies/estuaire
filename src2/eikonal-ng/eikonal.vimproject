@@ -1,0 +1,43 @@
+Eikonal=/home/jee/work/AGSIS-local/development/eikonal-ng CD=. filter="Makefile *py LICENSE" {
+ Makefile
+ config.py
+ setup.py
+ show.py
+ LICENSE
+ templates=templates CD=. filter="*.mako" {
+  narray.hpp.mako
+  nvect.hpp.mako
+  raytrace.hpp.mako
+  raytrace.pyx.mako
+  solver.hpp.mako
+  solver.pyx.mako
+ }
+ src=src CD=. filter="*.cpp *.pyx" {
+  test.cpp
+ }
+ pxd=src/eikonal filter="*.pxd" {
+  raytrace.pxd
+  solver.pxd
+ }
+ py=eikonal filter="*.py" {
+  __init__.py
+  cllinear.py
+  geikonal.py
+  linear.py
+ }
+ clapi=eikonal/clapi filter="*.py" {
+  __init__.py
+  cg_inverse.py
+  dd.py
+  esolve.py
+  gen_cone_mask.py
+  gen_events.py
+  gen_stations.py
+  gen_traveltime.py
+  gen_velocity_model.py
+  rand-station.py
+  raytrace.py
+  saveimg.py
+  sensitivity.py
+ }
+}

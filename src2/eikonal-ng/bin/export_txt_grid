@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+#
+# @Author : Jean-Pascal Mercier <jean-pascal.mercier@agsis.com>
+#
+# @Copyright (C) 2010 Jean-Pascal Mercier
+#
+# All rights reserved.
+#
+#
+
+import numpy as np
+
+import agstd.text
+
+grid_dtype = [("X", "int"),
+              ("Y", "int"),
+              ("Z", "int"),
+              ("value", "float64")]
+
+grid_desc = [ ("X", float, str, "X", 30),
+              ("Y", float, str, "Y", 30),
+              ("Z", float, str, "Z", 30),
+              ("value", str, str, 'value', 30)]
+
+grid_parser = agstd.text.TXTParser(grid_desc, grid_dtype)
+
+def export_txt_grid(grid, output):
+    indices = np.indices(grid.data.shape) * grid.spacing + \
+            np.reshape(grid.origin, [grid.data.ndim] + [1] * grid.data.ndim)
+    outgrid = np.zeros(grid.data.size, dtype = grid_dtype)
+
+    for c, i in zip(["X", "Y", "Z"], indices):
+        outgrid[c] = i.ravel()
+
+    outgrid['value'] = grid.data.ravel()
+
+    grid_parser.dump(output, outgrid)
+
+if __name__ == '__main__':
+    import agstd.main
+    agstd.main.main(export_txt_grid, grid = np.load)

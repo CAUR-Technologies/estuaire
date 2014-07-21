@@ -1,0 +1,10 @@
+#!/bin/bash
+pushd doc
+PYTHONPATH=../site_scons/site_tools/:$PYTHONPATH:../site_scons/:/usr/lib/scons/ make latex
+
+PYTHONPATH=../site_scons/site_tools/:$PYTHONPATH:../site_scons/:/usr/lib/scons/ make html
+pushd build/latex
+make all
+popd
+popd
+gnome-open doc/build/latex/Estuaire.pdf

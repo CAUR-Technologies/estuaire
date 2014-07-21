@@ -1,0 +1,81 @@
+#
+#
+#
+import agstd.log
+
+import logging
+logging.getLogger().setLevel(logging.DEBUG)
+
+import os
+import slopes
+
+
+env = Environment(tools = ['Lotic'])
+
+
+env['TOMOGRAPHY_SCRIPT_DIR'] = \
+        '/home/jee/work/AGSIS-local/development/eikonal-ng/eikonal/clapi'
+
+env['RAYTRACING_H'] = 1
+env['REPORT_ROOT'] = 'build/report'
+env['CG_GTOL'] = 1e-60
+
+# VARIABLE Descriptions
+db          = '/raid/jee/agsis/data/syn_50_new.h5f'
+group       = env.Value('synthetic');             group.name = 'group'
+catalog     = env.Value('random');        catalog.name = 'catalog'
+filters     = env.Value([dict(name = "cuboid",
+                              args = [(1,1,1), (125,125,125), 0.0])]); filters.name = 'filters'#ptype       = env.Value(['P-Wave', 'S-Wave']);          ptype.name = 'ptype'
+ptype       = env.Value(['P-Wave'])
+
+shape       = (64, 64, 64)
+spacing     = 2.0
+p_ivalue    = 4200
+
+
+grid        = slopes.GridDescription(env, (0, 0, 0), shape, spacing)
+
+weighting   = env.Value(dict(name = "uniform", args = []));             weighting.name = 'weighting'
+
+
+fetch_tgt = env.FetchDB(['build/fresh/events.npy',
+                         'build/fresh/stations.npy'], [db, group, catalog, filters, ptype, env.Value("build/fresh/S${sid}_${ptype}.pickle")])
+
+
+ev_tgt, st_tgt = fetch_tgt[:2]
+ev_tgt = grid.transform_to_grid_coordinates("build/events.pickle", ev_tgt)
+st_tgt = grid.transform_to_grid_coordinates("build/stations.pickle", st_tgt)
+tt_tgt = fetch_tgt[2:]
+
+plan = slopes.InversionPlan(env, ev_tgt, st_tgt)
+plan.insert_velocity_grid("one", p_ivalue, tt_tgt, shape, spacing)
+
+
+priors = slopes.exprange(20, (1e-6, 1e-9), 20)
+
+for i, (p,s) in enumerate(zip(priors, slopes.exprange(20, (15, 3), 20))):
+    plan.set_grid_inversion("one", prior = 1e-16, post_smoothing = s, )
+    plan.push_inversion("build.tomo_%d" % i, gtol = 1e6, weighting = slopes.GaussianWeighting(1.5), itype = 'newtoncg')
+
+    plan.set_event_position(prior = p)
+    plan.set_grid_inversion("one", prior = 1e-9, post_smoothing = s)
+    plan.set_double_difference(True)
+    plan.push_inversion("build/dd_%d" % i, itype = 'linearcg')
+
+#cboard = grid.get_checkerboard('build/checkerboard.pickle', 4, p_ivalue, 0.1)
+#vgrid = grid.get_homogenous_grid('build/checkerboard_initial.pickle', p_ivalue)
+#env.Default(plan.tomography_qa('one', cboard, vgrid, root = 'build'))
+
+
+
+
+env.Default(plan.current.vgrids['one'][0])
+
+env.Decider('MD5-timestamp')
+#
+#
+# vim: filetype=python
+#
+
+
+

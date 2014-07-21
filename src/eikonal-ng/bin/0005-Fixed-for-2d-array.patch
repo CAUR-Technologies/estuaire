@@ -1,0 +1,66 @@
+From 1b7c17e98b47d7cce4d4b4855b81086569ed68c3 Mon Sep 17 00:00:00 2001
+From: J-Pascal Mercier <jp.mercier@gmail.com>
+Date: Sun, 2 Oct 2011 11:42:05 -0400
+Subject: [PATCH 5/5] Fixed for 2d array
+
+---
+ bin/raytrace    |    5 ++---
+ bin/sensitivity |    5 +++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/bin/raytrace b/bin/raytrace
+index 75a471d..1468134 100755
+--- a/bin/raytrace
++++ b/bin/raytrace
+@@ -12,7 +12,6 @@ This script compute the rays from a list of event to a particular station.
+ """
+ 
+ import agstd.main as main
+-import agstd.sdb.dbase as dbase
+ 
+ import cPickle as pickle
+ import numpy as np
+@@ -48,7 +47,7 @@ def buildray(arrival, velocity, traveltime, h = 1):
+     stdesc = tttable.station_row
+ 
+ 
+-    start = tuple(velocity.transform_to(stdesc['position']))
++    start = tuple(velocity.transform_to(stdesc['position'][:arrival.data.ndim]))
+     current_events = tttable.event_rows
+ 
+     max_len = np.sqrt(np.sum(np.array(velocity.data.shape) ** 2))
+@@ -59,7 +58,7 @@ def buildray(arrival, velocity, traveltime, h = 1):
+     r = []
+ 
+     for i, evdesc in enumerate(current_events):
+-        finish = tuple(velocity.transform_to(evdesc['position']))
++        finish = tuple(velocity.transform_to(evdesc['position'][:arrival.data.ndim]))
+         rtt, ray = raytrace.raytrace(arrival.data, velocity.data, start, finish,
+                                            raybuffer, arrival.spacing, h = h)
+         tt = tttable.data['traveltime'][i] - stdesc['delta_t'] + evdesc['delta_t']
+diff --git a/bin/sensitivity b/bin/sensitivity
+index c7b6524..7377eab 100755
+--- a/bin/sensitivity
++++ b/bin/sensitivity
+@@ -43,7 +43,8 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
+ 
+     vgrid = velocity.data
+ 
+-    start = tuple(arrival.transform_to(stdesc['position']))
++    stpos = stdesc['position'][:len(arrival.shape)]
++    start = tuple(arrival.transform_to(stpos))
+     if np.any(np.sqrt(np.sum((arrival.seeds - start) ** 2, axis = 1)) > 0.0001):
+         raise ValueError("Station Position is not the seeds of the given arrival grid")
+ 
+@@ -73,7 +74,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
+                 "description" : description}
+ 
+     for i in xrange(len(current_events)):
+-        finish = tuple(arrival.transform_to(current_events[i]['position']))
++        finish = tuple(arrival.transform_to(current_events[i]['position'][:len(arrival.shape)]))
+         rtt, ind, sens = raytrace.sensivity(agrid, vgrid, start, finish,
+                                             indices_buffer,
+                                             sensivity_buffer,
+-- 
+1.7.5.4
+

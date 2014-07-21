@@ -1,0 +1,44 @@
+From 63e994c124670dd855d450e88974cd254659fc0c Mon Sep 17 00:00:00 2001
+From: J-Pascal Mercier <jp.mercier@gmail.com>
+Date: Sun, 2 Oct 2011 11:40:35 -0400
+Subject: [PATCH] Fixing eikonal seeds for 2d array
+
+---
+ site_scons/site_tools/EikonalSolver.py |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
+
+diff --git a/site_scons/site_tools/EikonalSolver.py b/site_scons/site_tools/EikonalSolver.py
+index 0ae98c2..ea7c82f 100644
+--- a/site_scons/site_tools/EikonalSolver.py
++++ b/site_scons/site_tools/EikonalSolver.py
+@@ -13,6 +13,7 @@ from SCons.Script import Builder, Action
+ import os
+ import subprocess
+ import numpy as np
++import cPickle as pickle
+ 
+ import logger
+ import escripts
+@@ -26,16 +27,18 @@ def EikonalSolver2(source, target, env):
+ 
+     """
+     velocityfile = str(source[0])
++    vgrid = pickle.load(open(velocityfile))
+ 
+     tttable = np.load(str(source[1]))
+     seed = tttable.station_row['position']
+ 
+-    strseed = [str(s) for s in seed]
++    strseed = [str(s) for sh, s in zip(vgrid.shape, seed)]
+ 
+     cmd = [escripts.EIKONAL_SOLVER, "--velocity", velocityfile, "--seeds",
+            '"%s"' % ",".join(strseed), "--output",
+            str(target[0])]
+ 
++
+     return subprocess.Popen(cmd).wait()
+ 
+ 
+-- 
+1.7.5.4
+

@@ -1,0 +1,246 @@
+#!/usr/bin/env python
+import agstd.log
+import os, sys, re, time, datetime, glob
+import dateutil.parser
+
+import agstd.sdb.sqldbase as dbase
+
+import numpy as np
+
+import scipy as sc
+import scipy.optimize
+
+import sqlite3
+import math
+
+import logging
+log = logging.root
+log.setLevel(logging.DEBUG)
+
+
+description_re = re.compile('[A-Za-z_0-9]+[\s]*=[^=^\n]*\s')
+filename_re = re.compile('(?P<year>[0-9][0-9][0-9][0-9])'
+                         '(?P<month>[\w][\w][\w])'
+                         '(?P<day>[0-9][0-9])'
+                         '(?P<hour>[0-9][0-9])'
+                         '(?P<min>[0-9][0-9])'
+                         '(?P<sec>[0-9][0-9])'
+                         '(?P<ms>[0-9][0-9][0-9])')
+
+p_event_re = re.compile('P-wave .*')
+s_event_re = re.compile('S-wave .*')
+
+time_re = re.compile('([0-9][0-9]):([0-9][0-9]):([0-9][0-9])\.([0-9][0-9][0-9][0-9][0-9][0-9])')
+etime_re = re.compile('([0-9][0-9]):([0-9][0-9]):([0-9][0-9])\.([0-9][0-9][0-9])')
+
+def parse_description(filename, dirname, **kw):
+    s = open(os.path.join(dirname, filename)).read()
+    additional_kw = [t for t in kw.iteritems()] + [('filename', filename)]
+    s_s = [["S-%s" % k for k in description_re.findall(ps)] for ps in s_event_re.findall(s)]
+    s_p = [["P-%s" % k for k in description_re.findall(ps)] for ps in p_event_re.findall(s)]
+    if len(s_s) != 0:
+        additional_kw.extend([[k.strip() for k in s_s1.strip().split('=')] for s_s1 in s_s[0]])
+    if len(s_p) != 0:
+        additional_kw.extend([[k.strip() for k in s_s1.strip().split('=')] for s_s1 in s_p[0]])
+    return dict([[k.strip() for k in t.strip().split('=')] for t in description_re.findall(s)] + additional_kw)
+
+def parse_dat(filename, dirname):
+    lines = open(os.path.join(dirname, filename)).readlines()[2:]
+    return np.array(lines, dtype = 'float32')
+
+def toEventTuple(description):
+    tlist = [int(t) for t in etime_re.match(description['TIME']).groups()]
+    t = tlist[0] * 60 * 60 + tlist[1] * 60 + tlist[2] + tlist[3] / 1.0e6
+    d = int(time.mktime(dateutil.parser.parse(description['DATE']).timetuple()))
+    return (d, description['filename'],
+            float(description['P-Mo']), float(description['P-E']), float(description['P-f']),
+            float(description['S-Mo']), float(description['S-E']), float(description['S-f']),
+            float(description['X']), float(description['Y']), float(description['Z']), t)
+
+def toTrgTuple(description, station_id):
+    return (station_id,
+            description['event_id'],
+            float(description['sample_rate']),
+            float(description['time']), int(description['Pos']),
+            float(description['Q0']), float(description['Q']),
+            float(description['NATURAL_FREQUENCY']), float(description['DAMPING_FACTOR']),
+            description['METER_TYPE'],
+            description['filename'], float(description['HYPO_DISTANCE']))
+
+def toPickSTuple(description, trigger_id):
+    ptime = float(description['time']) + (int(description['S']) - int(description['Pos'])) / float(description['sample_rate'])
+    return (trigger_id, float(description['Vs']), ptime, int(description['S']), sdb.pick_type.S_Wave)
+
+def toPickPTuple(description, trigger_id):
+    ptime = float(description['time']) + (int(description['P']) - int(description['Pos'])) / float(description['sample_rate'])
+    return (trigger_id, float(description['Vp']), ptime, int(description['P']), sdb.pick_type.P_Wave)
+
+def toStationTuple(description):
+    return (float(description['X']), float(description['Y']), float(description['Z']))
+
+
+
+
+seismogram_query = \
+"""
+INSERT INTO seismogram (station_id, event_id, data, date, meter_type, sample_rate,
+                        Q0, Q, damping_factor, natural_frequency, origin,frame)
+                        VALUES(:staid,:evnid,:seismogram,:DATE,:METER_TYPE,
+                               :sample_rate,:Q0,:Q,:DAMPING_FACTOR,
+                               :NATURAL_FREQUENCY,:filename,:Pos)
+"""
+
+event_query = \
+"""
+INSERT INTO event(X,Y,Z,Moment_P,Moment_S,Energy_P,Energy_S,origin)
+    VALUES(:X,:Y,:Z,:P_Mo,:S_Mo,:P_E,:S_E,:filename)
+"""
+
+delete_event_query = \
+"""
+DELETE FROM event WHERE id = :id;
+"""
+
+catalog_event_query = \
+"""
+INSERT INTO original_event_catalog(event_id,date,X,Y,Z)
+    VALUES(:id,:datetime,:X,:Y,:Z);
+"""
+
+catalog_traveltime_query = \
+"""
+INSERT INTO original_traveltime_catalog(pick_id,traveltime)
+                                        VALUES(?,?);
+"""
+
+pick_query = \
+"""
+INSERT INTO pick(seismogram_id,type,date,frame) VALUES(?,?,?,?);
+"""
+
+def date_average(datelst):
+    timefl = [time.mktime(d.timetuple()) + d.microsecond * 1.0e-6 for d in datelst]
+    return datetime.datetime.fromtimestamp(np.average(timefl))
+
+
+if __name__ == '__main__':
+    dbfile = sys.argv[1]
+    if os.path.exists(dbfile):
+        os.remove(dbfile)
+    db = sqlite3.connect(dbfile)
+    db.executescript(dbase.__DEFAULT_SEISMIC_DB__)
+
+    for indir in sys.argv[2:]:
+        filenames = os.listdir(indir)
+        filenames.sort()
+
+        log.info("%s --> %d files" % (indir, len(filenames)))
+
+        # ADDING TABLES
+        log.info("     --> Processing Events ...")
+        robust_splitary = []
+        for evnlst in np.split(filenames, [i+1 for i, f in enumerate(filenames[1:]) if f.endswith('evn')]):
+            trgs = [(t[:-4] + ".dat", t) for t in evnlst[1:] if t.endswith('trg')]
+            robust_splitary.append((evnlst[0], trgs))
+
+        # Processing Events
+        eptype = ['P']
+        #eptype = ['P', 'S']
+        log.info("using %s picks for determining the event time" % str(eptype))
+        for e, trgs in robust_splitary:
+            edesc = parse_description(e, indir)
+            edesc['P_Mo'] = edesc['P-Mo']
+            edesc['S_Mo'] = edesc['S-Mo']
+            edesc['P_E'] = edesc['P-E']
+            edesc['S_E'] = edesc['S-E']
+            db.execute(event_query, edesc)
+
+            evnid = db.execute("SELECT last_insert_rowid()").fetchone()[0]
+            edesc['id'] = evnid
+            log.info("Inserting event %s into DB" % edesc['filename'])
+
+            # Processing trigger desciption
+            trgs = [(dat, parse_description(trg, indir, evnid = evnid)) for dat, trg in trgs]
+            for dat, trgdesc in trgs:
+                trgdesc['DATE'] = dateutil.parser.parse("%s %s" % (edesc['DATE'], trgdesc['TT']))
+                trgdesc['DISTANCE'] = math.sqrt((float(trgdesc['X']) - float(edesc['X']))**2 \
+                                                + (float(trgdesc['Y']) - float(edesc['Y'])) ** 2 \
+                                                + (float(trgdesc['Z']) - float(edesc['Z'])) ** 2)
+
+                # Processing Station
+                cursor = db.execute("SELECT id FROM station WHERE X = :X AND Y = :Y AND Z = :Z", trgdesc )
+                staid = cursor.fetchone()
+                if staid is None:
+                    db.execute("INSERT INTO station(X, Y, Z) VALUES(:X,:Y,:Z)", trgdesc)
+                    trgdesc['staid'] = db.execute("SELECT last_insert_rowid()").fetchone()[0]
+                else:
+                    trgdesc['staid'] = staid[0]
+
+
+                trgdesc['seismogram'] = parse_dat(dat, indir).data
+                for ptype in ['P', 'S']:
+                    frame = int(trgdesc[ptype])
+                    trgdesc[ptype + "delta"] = (frame - int(trgdesc['Pos'])) * (1.0 / float(trgdesc['sample_rate']))
+                    trgdesc[ptype + "time"] = trgdesc['DATE'] + datetime.timedelta(seconds = trgdesc[ptype + "delta"])
+
+                print trgdesc['Ptime'], trgdesc['DISTANCE']
+
+            # Calculating real event time
+            edatelst = []
+            for ptype in eptype:
+                trgdelta = [datetime.timedelta(seconds = float(trgdesc['DISTANCE']) / float(trgdesc['V' + ptype.lower()])) for dat, trgdesc in trgs]
+                edatelst.extend([trgdesc[ptype + "time"] - delta for delta, (dat, trgdesc) in zip(trgdelta, trgs)])
+
+            edate = date_average(edatelst)
+
+            # Update event catalog table
+            edesc['id'] = evnid
+            edesc['datetime'] = edate
+            db.execute(catalog_event_query, edesc)
+
+            # Updating Pick
+            npick = 0
+            for dat, trgdesc in trgs:
+                try:
+                    db.execute(seismogram_query, trgdesc)
+                    trgid = db.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+                    # Processing pick
+                    for ptype in ['P', 'S']:
+                        frame = int(trgdesc[ptype])
+                        if frame != 0:
+                            db.execute(pick_query, (trgid, ptype, trgdesc[ptype + 'time'], frame))
+                            pickid = db.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+                            traveltime = trgdesc[ptype + 'time'] - edesc['datetime']
+                            traveltime = traveltime.days * 24 * 60 * 60 + traveltime.seconds + traveltime.microseconds * 1.0e-6
+
+                            if traveltime > 0:
+                                db.execute(catalog_traveltime_query, (pickid, traveltime))
+                            else:
+                                log.warning("Negative traveltime detected <evnid=%d, staid=%d, type=%s, tt=%f>" % \
+                                            (trgdesc['evnid'], trgdesc['staid'], ptype, traveltime))
+                    npick += 1
+                except sqlite3.IntegrityError:
+                    while True:
+                        answer = raw_input("Integrity error when parsing %s ((A)bort/(I)gnore):" % trgdesc['filename'])
+                        if answer == 'A':
+                            raise
+                        elif answer == 'I':
+                            break
+            if npick < 5:
+                log.error("Event removed %s ... not enough pick %i" % (edesc['filename'], npick))
+                db.execute(delete_event_query, edesc)
+
+        db.commit()
+
+
+
+
+
+
+
+
+
+
+

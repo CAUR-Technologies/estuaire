@@ -1,0 +1,103 @@
+import os
+
+import slopes
+import dbfilter
+
+import agstd.log
+
+import logging
+logging.getLogger().setLevel(logging.DEBUG)
+
+env = Environment(tools = ['Lotic', 'ModelVariance'])
+
+env['REPORT_ROOT'] = 'build/report'
+env['REPORT_RESIDUAL_HISTOGRAM_RANGE'] = [-0.015, 0.015]
+
+# VARIABLE Descriptions Database
+SQLDB       = '/raid/data/2010/Northparkes/E48_biweekly/E48_prelim_sp.sqlite'
+H5FDB       = '/raid/data/2010/Northparkes/E48_biweekly/E48_prelim.h5f'
+CATALOG     = 'average'
+GROUP       = 'E48'
+
+# Grid Inversion Description
+grid      = slopes.GridDescription(env, (-55650, -11400, -10250), (128, 128, 128), 7)
+
+S_IVALUE    = 2838
+P_IVALUE    = 4635
+
+
+
+fetch_plan = slopes.H5FDBFetchPlan(env, H5FDB, CATALOG,
+                                   "build/raw_events.pickle", "build/raw_stations.pickle", GROUP)
+fetch_plan.set_grid_filter(grid)
+#fetch_plan.additive_gaussian_noise(event_time = 0.001, station_time = 0.001)
+#fetch_plan.set_date_filter("2009-12-01", "2010-12-01")
+#fetch_plan.set_grid_filter(grid)
+
+P_tt_tgt = fetch_plan.fetch_traveltime('P', "build/tt/P-S${sid}.pickle")
+
+# Inversion Plan Creation
+plan = slopes.InversionPlan.from_fetch_plan(fetch_plan)
+
+imodel_P = grid.get_homogenous_grid("build/initial_P.pickle", P_IVALUE)
+
+plan.insert_velocity_grid_desc("P", imodel_P, P_tt_tgt)
+#plan.insert_velocity_grid_desc("S", grid, S_IVALUE, S_tt_tgt)
+
+
+# Description of the behavior of the prior and the post smoothing.
+EXPSIZE = 20
+EXPPARAM = 200
+
+PRIOR_RANGE = (1e-6, 1e-10)
+SIGMA_RANGE = (200, 50)
+
+sigmas = slopes.exprange(10, SIGMA_RANGE, size = EXPSIZE)
+priors = slopes.exprange(50, PRIOR_RANGE, size = EXPSIZE)
+#epriors = slopes.exprange(20, (1e-5, 1e-7), size = EXPSIZE)
+
+##Loop over sigmas and prior values.
+for i, (p, s) in enumerate(zip(priors[:], sigmas)):
+    plan.set_station_time(0)
+    plan.push_inversion("build/st_%i" % i,
+                        gtol = 1e-8, report = True, itype = 'newtoncg')
+
+    plan.set_grid_inversion("P", prior = 0, post_smoothing = s)
+    plan.push_inversion("build/tomo_%i" % i,
+                        gtol = 1e-8,  report = True, itype = 'newtoncg', weighting = slopes.GaussianWeighting(1.5))
+
+
+    plan.set_event_time(0)
+    plan.push_inversion("build/et_%i" % i, itype='linearcg', report = True)
+
+    plan.set_event_position(0)
+    plan.set_grid_inversion("P", prior = 0, post_smoothing = s)
+
+    plan.set_double_difference(True)
+    plan.push_inversion("build/ep_%i" % i,
+                        gtol = 1e-8,  report = True, itype = 'newtoncg')
+ 
+
+
+
+    #plan.set_event_time(0)
+    #plan.push_inversion("plan/et_%d" %i, report = True, itype = 'newtoncg', weighting = slopes.GaussianWeighting(2.0))
+
+
+
+
+
+
+## Defining default Target and default decider
+env.Default(plan.get_report("../../css/default.css"))
+#env.Default(env.ExportTXTGrid(['test.txt'], [plan.current.vgrids['P'].tgt]))
+
+#env.Default(plan.tomography_qa('P', 56, P_IVALUE, 0.1, P_IVALUE, root = 'build'))
+
+
+env.Decider('MD5-timestamp')
+
+#
+#
+# vim: filetype=python
+#

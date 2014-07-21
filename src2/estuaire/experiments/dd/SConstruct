@@ -1,0 +1,227 @@
+# vim: filetype=python
+#
+#
+#
+
+import os
+
+env = Environment(tools = ['Lotic'])
+
+env['TOMOGRAPHY_SCRIPT_DIR'] = \
+        '/home/jee/work/AGSIS-local/development/eikonal-ng/eikonal/clapi'
+
+env['RAYTRACING_H'] = 1
+env['INVERSION_TOMOGRAPHY_GTOL'] = 1e-60
+
+# VARIABLE Descriptions
+db          = '/home/jee/data/syn_50.h5f';
+group       = env.Value('syn');             group.name = 'group'
+catalog     = env.Value('random');        catalog.name = 'catalog'
+filters     = env.Value([dict(name = "cuboid",
+                              args = [(0,0,0), (128,128,128), 0.01])]); filters.name = 'filters'#ptype       = env.Value(['P-Wave', 'S-Wave']);          ptype.name = 'ptype'
+ptype       = env.Value(['P-Wave']);          ptype.name = 'ptype'
+
+shape       = env.Value((64, 64, 64));          shape.name = 'shape'
+spacing     = env.Value(2.0);                   spacing.name = 'spacing'
+ispacing    = env.Value(1.0 / spacing.value);   ispacing.name = 'ispacing'
+origin      = env.Value((0, 0, 0));             origin.name = 'origin'
+s_ivalue    = env.Value(2500);                  s_ivalue.name = 's_ivalue'
+p_ivalue    = env.Value(4000);                  p_ivalue.name = 'p_ivalue'
+
+eta         = 0.0005
+
+pvalue       = 0.000005 ** 2
+
+
+weighting   = env.Value(dict(name = "gaussian", args = [2]));             weighting.name = 'weighting'
+
+
+
+#D_tgt = env.GridDifference(['build/difference.npy'], [shape, eta])
+
+VP_grid_tgt = env.VelocityGrid(['build/p_velocity0.npy'], [shape, p_ivalue])
+#VS_grid_tgt = env.VelocityGrid(['build/s_velocity0.npy'], [shape, s_ivalue])
+
+#VP_grid_tgt = ['/home/jee/data/test/Vp_rand.npy']
+
+fetch_tgt = env.FetchDB(['build/fresh/events.npy', 'build/fresh/stations.npy'],
+                        [db, group, catalog, filters, ptype,
+                         env.Value("build/fresh/S${sid}_${ptype}.pickle")])
+
+ev_tgt = env.EuclidianTransform(['build/initial/events.npy'],
+                                [fetch_tgt[0], origin, ispacing])
+
+st_tgt = env.EuclidianTransform(['build/initial/stations.npy'],
+                                [fetch_tgt[1], origin, ispacing])
+
+tt_tgt = fetch_tgt[2:]
+
+
+
+priors = [env.Value(0.0000001)]
+
+for i, e in enumerate([0.0005, 0.0005]):
+    priors = [env.Value(pvalue / (5 ** i))]
+    ieta = env.Value((e, e / 20.0))
+
+    eik_tgt = [env.EikonalSolver2([('build/it_tt%i/arrival_' % i) + os.path.basename(str(t))],
+                          [VP_grid_tgt[0], st_tgt[0], t, spacing])[0] for t in tt_tgt]
+
+    fre_tgt = []
+    for t, e in zip(tt_tgt, eik_tgt):
+        fname = 'build/it_fwd%d/%s' % (i, os.path.basename(str(e)).replace("arrival", "frechet"))
+        fre_tgt.append(env.FrechetDerivative([fname],
+                                             [VP_grid_tgt[0], e, ev_tgt[0], st_tgt[0], t, spacing])[0])
+
+
+    D_tgt = env.GridDifference(['build/it_difference%i.npy' % i], [shape, ieta, spacing])
+
+    gridname = os.path.basename(str(VP_grid_tgt[0]))
+    final = env.CGInverse(['build/it_inv%d/result.npy' % i,
+                           'build/it_inv%d/A.npy' % i,
+                           'build/it_int%d/R.npy' % i,
+                           'build/it_inv%d/prior.npy' % i,
+                           'build/it_inv%d/smoothing.npy' % i ,
+                           'build/it_inv%d/initial.npy' % i,
+                           'build/it_inv%d/description.pickle' % i],
+                          [Value([gridname]), # Column Name
+                           [priors],                            # Priors
+                           [D_tgt[0]],                      # Smoothing
+                           [VP_grid_tgt[0]],                         # Initial
+                           weighting,                           # Weighting
+                           fre_tgt])                            # Sensivity
+
+    VP_grid_tgt = env.SaveGrid(['build/it_p_velocity%d.npy' % (i)],
+                               [env.Value(gridname), final])
+
+
+
+
+for i, e in enumerate([0.0001, 0.0001, 0.00005,0.00005 ]):
+    priors = [env.Value(pvalue / (5 ** i)), env.Value(0.00001)]
+    ieta = env.Value((e, e / 20.0))
+
+    eik_tgt = [env.EikonalSolver2([('build/tt%i/arrival_' % i) + os.path.basename(str(t))],
+                          [VP_grid_tgt[0], st_tgt[0], t, spacing])[0] for t in tt_tgt]
+
+    fre_tgt = []
+    dd_tgt = []
+    for t, e in zip(tt_tgt, eik_tgt):
+        fname = 'build/fwd%d/%s' % (i, os.path.basename(str(e)).replace("arrival", "frechet"))
+        fre = env.FrechetDerivative([fname],
+                                    [VP_grid_tgt[0], e, ev_tgt[0], st_tgt[0], t, spacing])[0]
+
+        fre_tgt.append(fre)
+        dname = 'build/fwd%d/%s' % (i, os.path.basename(str(e)).replace("arrival", "dd"))
+        dd_tgt.append(env.DoubleDifference([dname], [fre]))
+
+
+    D_tgt = env.GridDifference(['build/difference%i.npy' % i], [shape, ieta, spacing])
+
+    ivalue = env.ExtractColumn(['build/epos_%d.npy' % i],
+                               [ev_tgt[0], env.Value('position')])
+
+
+    gridname = os.path.basename(str(VP_grid_tgt[0]))
+    final = env.CGInverse(['build/inv%d/result.npy' % i,
+                           'build/inv%d/A.npy' % i,
+                           'build/inv%d/prior.npy' % i,
+                           'build/inv%d/smoothing.npy' % i ,
+                           'build/inv%d/initial.npy' % i,
+                           'build/inv%d/description.pickle' % i],
+                          [Value([gridname, 'event_position']), # Column Name
+                           [priors],                            # Priors
+                           [D_tgt[0], env.Value(0)],                      # Smoothing
+                           [VP_grid_tgt[0], ivalue],                         # Initial
+                           weighting,                           # Weighting
+                           dd_tgt])                            # Sensivity
+
+    VP_grid_tgt = env.SaveGrid(['build/p_velocity%d.npy' % (i + 1)],
+                               [env.Value(gridname), final])
+
+    ev_tgt = env.UpdateTable(['build/events_%i.npy' % i],
+                             [env.Value('event_position'),
+                              env.Value('position'), ev_tgt[0]] + final)
+
+    tt_tgt = [env.FilterDB(['build/res%i/%s' % (i, os.path.basename(str(tt)))],
+                           [ev_tgt[0], st_tgt[0], tt, env.Value((1, 1, 1)), env.Value((62, 62, 62))])[0] for tt in tt_tgt]
+
+
+    
+#for i in range(1):
+    #eik_tgt = [env.EikonalSolver2(['build/tt/arrival_' + os.path.basename(str(t))],
+                              #[VP_grid_tgt[0], fetch_tgt[1], t, spacing])[0] for t in tt_tgt]
+
+
+
+    #fre_tgt = []
+    #for t, e in zip(tt_tgt, eik_tgt):
+        #fname = 'build/fwd%d/%s' % (i, os.path.basename(str(e)).replace("arrival", "frechet"))
+        #fre_tgt.append(env.FrechetDerivative([fname],
+                                             #[VP_grid_tgt[0], e, ev_tgt[0], st_tgt[0], t, spacing])[0])
+
+
+    #final = env.CGInverse(['build/inv%d/result.npy' % i,
+                           #'build/inv%d/A.npy' % i,
+                           #'build/inv%d/prior.npy' % i,
+                           #'build/inv%d/smoothing.npy' % i ,
+                           #'build/inv%d/initial.npy' % i,
+                           #'build/inv%d/description.pickle' % i],
+                          #[Value(['event_position']),           # Column Name
+                           #[priors],                            # Priors
+                           #[env.Value(0)],                      # Smoothing
+                           #[ivalue[0]],                         # Initial
+                           #weighting,                           # Weighting
+                           #fre_tgt])                            # Sensivity
+
+
+    #ivalue = env.ExtractColumn(['build/epos_%d.npy' % i],
+                               #[ev_tgt[0], env.Value('position')])
+
+
+    #final = env.CGInverse(['build/inv%d/result.npy' % i,
+                           #'build/inv%d/A.npy' % i,
+                           #'build/inv%d/prior.npy' % i,
+                           #'build/inv%d/smoothing.npy' % i ,
+                           #'build/inv%d/initial.npy' % i,
+                           #'build/inv%d/description.pickle' % i],
+                          #[Value(['event_position']),           # Column Name
+                           #[priors],                            # Priors
+                           #[env.Value(0)],                      # Smoothing
+                           #[ivalue[0]],                         # Initial
+                           #weighting,                           # Weighting
+                           #fre_tgt])                            # Sensivity
+
+
+    #ev_tgt = env.UpdateTable(['build/events_%i.npy' % i],
+                             #[env.Value('event_position'),
+                              #env.Value('position'), ev_tgt[0]] + final)
+
+
+    #tt_tgt = [env.FilterDB(['build/res%i/%s' % (i, os.path.basename(str(tt)))],
+                           #[ev_tgt[0], st_tgt[0], tt, env.Value((1, 1, 1)), env.Value((124, 124, 124))])[0] for tt in tt_tgt]
+
+
+
+
+
+    #VP_grid_tgt = env.SaveGrid(['build/p_velocity%d.npy' % (i + 1)],
+    #                           [Value('p_velocity%d.npy' % i), final])
+
+#update = env.UpdateModel(['build/updated/events.npy',
+#                          'build/udpated/stations.npy'],
+#                         [final,
+#                          'build/fresh/events.npy'
+#                          'build/fresh/stations.npy'])]
+
+target = [VP_grid_tgt[0]]
+
+env.Default(target)
+
+env.Clean(final, Dir('build'))
+
+env.Decider('MD5-timestamp')
+
+
+
+

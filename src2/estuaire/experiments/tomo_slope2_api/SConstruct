@@ -1,0 +1,90 @@
+import os
+
+import slopes
+import dbfilter
+
+import agstd.log
+
+import logging
+logging.getLogger().setLevel(logging.DEBUG)
+
+env = Environment(tools = ['Lotic', 'Checkerboard'])
+
+env['REPORT_ROOT'] = 'build/report'
+env['REPORT_RESIDUAL_HISTOGRAM_RANGE'] = [-0.015, 0.015]
+
+
+# VARIABLE Descriptions Database
+DB          = '/home/data/syn_50_new.h5f'
+#SQLDB       = '/raid/jee/agsis/development/deprecated/eikonal-first/scripts/data/test.sqlite'
+GROUP       = 'synthetic'
+CATALOG     = 'original'
+
+
+# Grid Inversion Description
+
+S_IVALUE    = 2500
+P_IVALUE    = 4200
+
+INIT_PRIOR  = 1e-13
+
+grid = slopes.GridDescription(env, (0, 0, 0), (128, 128, 128), 1.0)
+
+
+fetch_plan = slopes.H5FDBFetchPlan(env, DB, CATALOG, 'build/events.pickle', 'build/stations.pickle', GROUP)
+fetch_plan.set_grid_filter(grid)
+#fetch_plan.additive_gaussian_noise( event_time = 0.05)
+fetch_plan.additive_gaussian_noise( event_position = 7)
+
+
+# Inversion Plan Creation
+P_tt_tgt = fetch_plan.fetch_traveltime("P",  "build/tt/P-S${sid}.pickle")
+plan = slopes.InversionPlan(env, fetch_plan.evnfile, fetch_plan.stafile)
+
+#plan.insert_velocity_grid("two", VS_grid_tgt, tt_tgt2, SHAPE, SPACING)
+#imodel = '../../synthetic/Vp_rand_spacing2.pickle'
+imodel = grid.get_homogenous_grid("./build/initial_P.pickle", P_IVALUE)
+plan.insert_velocity_grid("P", imodel, P_tt_tgt)
+#plan.insert_velocity_grid("P", grid.HomogenousGrid(P_IVALUE), P_tt_tgt)
+
+# Description of the behavior of the prior and the post smoothing.
+EXPSIZE = 20
+EXPPARAM = 200
+
+PRIOR_RANGE = (INIT_PRIOR, INIT_PRIOR / 10.0)
+SIGMA_RANGE = (5,3)
+
+sigmas = slopes.exprange(20, SIGMA_RANGE, size = EXPSIZE)
+priors = slopes.exprange(50, PRIOR_RANGE, size = EXPSIZE)
+epriors = slopes.exprange(20, (1e-6, 1e-8), size = EXPSIZE)
+
+# Loop over sigmas and prior values.
+for j, (ep, s, p) in enumerate(zip(epriors, sigmas, priors)):
+    #plan.set_event_time(prior = 0)
+    #plan.set_station_time(prior = 0)
+    #plan.push_inversion("build/et%d" % j, report = True, itype = 'linearcg', gtol = 1e-30)
+
+    #plan.set_grid_inversion("one", prior = 0, post_smoothing = s)
+    #plan.push_inversion("build/tomo%d" %j, report = True, itype = 'newtoncg', gtol = 1e-8)
+    #plan.set_event_position(prior = ep)
+    #print ep
+
+    #plan.push_inversion("build/ep%d" %j, report = True, itype = 'linearcg', gtol = 1e-8)
+
+    plan.set_event_position(prior = 0)
+    plan.push_inversion("build/ep_%d" %j, report = True, itype = 'linearcg')
+    #plan.push_inversion("build/ep_%d" %j, report = True, itype = 'linearcg')
+
+
+# Defining default Target and default decider
+#env.Default(plan.get_report("../../css/default.css"))
+
+
+env.Decider('MD5-timestamp')
+#env.Default(plan.tomography_qa("P", 4, P_IVALUE, 0.1, itype = 'newtoncg'))
+env.Default([plan.current.events, plan.current.stations])
+
+#
+#
+# vim: filetype=python
+#

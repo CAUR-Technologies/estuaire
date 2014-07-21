@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+#
+# @Author : Jean-Pascal Mercier <jean-pascal.mercier@agsis.com>
+#
+# @Copyright (C) 2010 Jean-Pascal Mercier
+#
+# All rights reserved.
+#
+__doc__ = """
+This script is used to create a sensivity matrix/residual vector,
+from pre-calculated rays and using the a velocity model as the standard
+velocity.
+
+Normally, the rays are always calculated inside a velocity model at the same
+time as the Frechet(Sensivity) Matrix. However, when we are want to assert the
+resolution from a given model, we used rays calculated in this model to create
+the Matrix.
+
+"""
+
+import eikonal.raytrace as raytrace
+import numpy as np
+import scipy as sc
+import scipy.sparse
+
+import os
+import sys
+
+import agstd.main as main
+
+def cross_sensivity_main(velocity, standard_velocity, raypath, grid_id):
+    """
+    :param velocity: The velocity we want to inverse (EKImageGrid)
+    :param standard_velocity: The standard velocity (i.e. The known model)
+    :param raypath: Pre-Calculated set of raypath
+    :param grid_id: The column indentifier used to identify the grid
+    """
+
+    if (velocity.check_compatibility(standard_velocity)):
+        raise ValueError("Standard Velocity and Velocity must have same" \
+                         "origin, spacing and shape")
+
+    vgrid = velocity.data
+    svgrid = standard_velocity.data
+
+    description = { grid_id : vgrid.shape }
+    if len(raypath['rays']) == 0:
+        return {'residual' : np.array([]), 'description' : description, 'grid_id' : [] }
+    max_len = np.max([len(r) for r in raypath['rays']])
+
+    indices_buffer = np.zeros(max_len * (4 ** vgrid.ndim) * 2,  dtype = 'uintp')
+    sensivity_buffer = np.zeros(max_len * (4 ** vgrid.ndim) * 2 , dtype = 'float')
+
+    Gindices_X = []
+    Gindices_Y = []
+    Gfrechet = []
+
+    r = []
+
+    for i, ray in enumerate(raypath['rays']):
+        rtt, ind, fre = raytrace.ray_sensivity(vgrid, ray, indices_buffer, sensivity_buffer, 1)
+        tt = raytrace.ray_traveltime(svgrid, ray, 1)
+
+        Gfrechet.extend(fre.tolist())
+        Gindices_X.extend(ind.tolist())
+        Gindices_Y.extend([i] * ind.size)
+
+        r.append(tt - rtt)
+
+    GA = sc.sparse.coo_matrix((Gfrechet, (Gindices_Y, Gindices_X)),
+                              (len(r), vgrid.size)).tocsr()
+
+
+
+    return {"residual" : r, grid_id : GA,
+            "description" : description}
+
+
+
+if __name__ == "__main__":
+    main.main(cross_sensivity_main, raypath = np.load,
+              standard_velocity = np.load, velocity = np.load)
+

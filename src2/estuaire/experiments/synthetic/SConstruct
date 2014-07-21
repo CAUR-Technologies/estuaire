@@ -1,0 +1,21 @@
+import glob
+
+
+
+import os
+
+import slopes
+import dbfilter
+
+import agstd.log
+
+import logging
+
+env = Environment(tools = ['Lotic', 'Checkerboard', 'SQLPushDB'])
+
+EVFILE = '/raid/jee/agsis/synthetic/test/event.npy'
+STFILE = '/raid/jee/agsis/synthetic/test/station.npy'
+
+TTFILES = glob.glob('/raid/jee/agsis/synthetic/test/stations/*')
+
+env.SQLPushDB(['build/test.sqlite'], [EVFILE, STFILE, TTFILES])

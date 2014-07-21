@@ -1,0 +1,5 @@
+
+estuaire=./ CD=. filter="*" {
+ initrd.img
+ vmlinuz
+}

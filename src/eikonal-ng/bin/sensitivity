@@ -1,0 +1,159 @@
+#!/usr/bin/env python
+#
+# @Author : Jean-Pascal Mercier <jean-pascal.mercier@agsis.com>
+#
+# @Copyright (C) 2010 Jean-Pascal Mercier
+#
+# All rights reserved.
+#
+__doc__ = """
+"""
+import agstd.main as main
+
+import cPickle as pickle
+import numpy as np
+import scipy as sc
+import scipy.sparse
+import os
+
+import eikonal.raytrace as raytrace
+
+import sys
+
+from itertools import izip
+
+sys.stdout = sys.stderr
+
+
+
+def sensivity(arrival, velocity, traveltime, grid_id, h = None):
+    if h is None:
+        h = 1
+    h = float(h)
+
+    if (arrival.spacing != velocity.spacing) or (arrival.shape != velocity.shape):
+        raise AttributeError("Arrival and Velocity grid incompatible")
+
+    tttable = traveltime
+    stdesc = tttable.station_row
+    current_events = tttable.event_rows
+
+    agrid = arrival.data
+
+
+    vgrid = velocity.data
+
+    stpos = stdesc['position'][:len(arrival.shape)]
+    start = tuple(arrival.transform_to(stpos))
+    if np.any(np.sqrt(np.sum((arrival.seeds - start) ** 2, axis = 1)) > 0.0001):
+        raise ValueError("Station Position is not the seeds of the given arrival grid")
+
+    max_len = np.sqrt(np.sum(np.array(vgrid.shape) ** 2)) * (4 ** len(vgrid.shape))
+    indices_buffer = np.zeros(max_len * (8.0 / h),  dtype = 'uintp')
+    sensivity_buffer = np.zeros(max_len * (8.0 / h) , dtype = 'float')
+
+    Gindices_X = []
+    Gindices_Y = []
+    Gsensivity = []
+
+    r = []
+
+    EPA_X = []
+    EPA_Y = []
+    EPA_V = []
+
+    description = { grid_id : agrid.shape,
+                    "event_position" : (tttable.event_table.size, len(start)),
+                    "event_time" : (tttable.event_table.size),
+                    "station_time" : (tttable.station_table.size) }
+
+    # We verify if we can create a sparse matrix
+    if len(current_events) == 0:
+        return {"residual" : None, grid_id : None, "station_time" : None,
+                "event_time" : None, "event_position" : None,
+                "description" : description}
+
+    for i in xrange(len(current_events)):
+        finish = tuple(arrival.transform_to(current_events[i]['position'][:len(arrival.shape)]))
+        rtt, ind, sens = raytrace.sensivity(agrid, vgrid, start, finish,
+                                            indices_buffer,
+                                            sensivity_buffer,
+                                            velocity.spacing,
+                                            h = h)
+
+        tt = tttable.data['traveltime'][i] + stdesc['delta_t'] - current_events[i]['delta_t']
+        ri = (tt - rtt)
+
+        r.append(ri)
+
+
+
+        # Calculation of the Frechet Derivative for the Event position
+        for j in xrange(len(finish)):
+            delta = 0.1
+            new_finish = list(finish)
+            new_finish[j] += delta
+            new_finish1 = tuple(new_finish)
+            new_finish[j] -= 2 * delta
+            new_finish2 = tuple(new_finish)
+
+
+            perturbated_tt1 = raytrace.traveltime(agrid, vgrid,
+                                                 start, new_finish1,
+                                                 velocity.spacing,
+                                                 h = h)
+
+            perturbated_tt2 = raytrace.traveltime(agrid, vgrid,
+                                                 start, new_finish2,
+                                                 velocity.spacing,
+                                                 h = h)
+            EPA_Y.append(i)
+            EPA_X.append(tttable.data['event_id'][i] * len(finish) + j)
+            EPA_V.append((perturbated_tt1 - perturbated_tt2) / (velocity.spacing * delta))
+
+
+
+        Gsensivity.extend(sens.tolist())
+        Gindices_X.extend(ind.tolist())
+        Gindices_Y.extend([i] * ind.size)
+
+
+    r = np.array(r, dtype = 'float')
+
+    GA = sc.sparse.coo_matrix((Gsensivity, (Gindices_Y, Gindices_X)),
+                              (len(r), vgrid.size)).tocsr()
+
+    del Gindices_X, Gindices_Y, Gsensivity
+
+    # Frechet Derivative for Event position
+    EPA = sc.sparse.coo_matrix((EPA_V, (EPA_Y, EPA_X)),
+                               (len(r), tttable.event_table.size * len(start))).tocsr()
+
+
+    del EPA_X, EPA_Y, EPA_V
+
+
+    # Frechet Derivative for the Station time
+    SA_Y = ETA_Y = range(len(r))
+    SA_X = [tttable.station_id] * len(r)
+    SA_V =  [-1] * len(r)
+    SA = sc.sparse.coo_matrix((SA_V, (SA_Y, SA_X)),
+                              (len(r), tttable.station_table.size)).tocsr()
+
+    del SA_X
+
+    ETA_X = tttable.data['event_id']
+    ETA_V = [1] * len(r)
+
+    # Frechet Derivative for the Event time
+    ETA = sc.sparse.coo_matrix((ETA_V, (ETA_Y, ETA_X)),
+                               (len(r), tttable.event_table.size), dtype = 'float')
+
+
+    return {"residual" : r, grid_id : GA, "station_time" : SA,
+            "event_time" : ETA, "event_position" : EPA,
+            "description" : description}
+
+
+if __name__ == "__main__":
+    main.main(sensivity, traveltime = np.load, arrival = np.load, velocity = np.load)
