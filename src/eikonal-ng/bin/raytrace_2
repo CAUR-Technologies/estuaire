@@ -18,6 +18,8 @@ import numpy as np
 import scipy as sc
 import scipy.sparse
 import os
+#from agstd.cli import ProgressBar
+import sys
 
 import eikonal.raytrace as raytrace
 
@@ -38,7 +40,7 @@ def buildray(arrival, velocity, events, h = 1):
     :param h: The step of the RK integration Scheme.
     """
 
-    current_events = np.array([[float(s) for s in w.split(',')] for w in events.strip('"').split(':')])
+    current_events = np.load(events)
     h = 1 if h is None else float(h)
 
     if not (velocity.check_compatibility(arrival)):
@@ -54,8 +56,12 @@ def buildray(arrival, velocity, events, h = 1):
     rays = []
 
     #velocity.origin = np.array(velocity.origin)
+    #PB = ProgressBar(size=len(current_events))
 
     for i, evdesc in enumerate(current_events):
+        sys.stdout.write("\rProcessing event %d of %d" % (i, len(current_events)))
+
+        #PB()
         finish = tuple(velocity.transform_to(evdesc))
         rtt, ray = raytrace.raytrace(arrival.data, velocity.data, start, finish,
                                            raybuffer, arrival.spacing, h=h)

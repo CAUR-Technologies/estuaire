@@ -98,7 +98,7 @@ def esolve(velocity, seeds, subgrid_spacing = 10, second_order = True, spacing =
     :return: EKImageData reprenting the arrival grid.
     """
     if np.any(velocity <= 0):
-        raise ValueError("Eikonal Solver Rely On the Causality of the solution. The Velocity grid MUST be all positive values")
+        raise ValueError("Eikonal Solver Relies On the Causality of the solution. The Velocity grid MUST be all positive values")
     if isinstance(velocity, eikonal.data.EKImageData):
         idata = velocity
         velocity = idata.data
@@ -111,7 +111,8 @@ def esolve(velocity, seeds, subgrid_spacing = 10, second_order = True, spacing =
 
     for s in seeds:
         if not check_boundary(s, velocity.shape):
-            log.critical("Seed outside grid boundary")
+            # log.critical("Seed outside grid boundary")
+            print "Seed outside grid boundary"
             sys.exit(1)
 
     # Disabled until more testing
