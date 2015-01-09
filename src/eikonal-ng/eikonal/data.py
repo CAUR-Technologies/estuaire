@@ -164,6 +164,14 @@ class EKImageData(object):
         cp = copy.deepcopy(self)
         return cp
 
+    def SaveNLL(self):
+        pass
+        
+    def LoadNLL(self):
+        pass
+
+    ### ADDING method to save and load on data from/to NLL 
+
 
 
 
