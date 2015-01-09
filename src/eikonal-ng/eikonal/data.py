@@ -13,6 +13,7 @@ TODO : BIG DESCRIPTION OF EXCHANGE DATA
 
 import numpy as np
 import cPickle as pickle
+import copy
 
 from agstd.decorators import memoize
 
@@ -143,7 +144,7 @@ class EKImageData(object):
         return (values - self.origin) / self.spacing
 
     def transform_from(self, values):
-        return (values + self.origin) * spacing
+        return (values + self.origin) * self.spacing
 
     def check_compatibility(self, other):
         return (self.shape == other.shape) and \
@@ -158,5 +159,11 @@ class EKImageData(object):
         data = np.empty_like(self.data)
         data.fill(value)
         return EKImageData(data, self.spacing, origin = self.origin)
+
+    def copy(self):
+        cp = copy.deepcopy(self)
+        return cp
+
+
 
 
