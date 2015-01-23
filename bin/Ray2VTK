@@ -1,0 +1,117 @@
+#!/usr/bin/env python
+
+import vtk
+from optparse import OptionParser
+from glob import glob
+import cPickle as pickle
+from tvtk.api import tvtk
+import numpy as np
+from mayavi import mlab
+from tvtk.tools import mlab
+
+#points = array([[0,0,0], [1,0,0], [0,1,0], [0,0,1]], 'f')
+#triangles = array([[0,1,3], [0,3,2], [1,2,3], [0,2,1]])
+
+# The TVTK dataset.
+parser = OptionParser(usage = "usage: %prog [options] <ray files> <output file>")
+
+parser.add_option('-d','--decimate',default=1,
+                 help='decimation ratio')
+
+parser.add_option('-g','--grid',default=None,
+                  help='Grid file to define the grid origin')
+
+(options, args) = parser.parse_args()
+
+decimate = int(options.decimate)
+
+grid = options.grid
+origin = np.array([0,0,0])
+spacing = 1
+if grid:
+    gd = np.load(grid)
+    origin = np.array(gd.origin)
+    spacing = gd.spacing
+
+rayfiles=args[0]
+outfile = args[1]
+
+points = []
+lines = tvtk.CellArray()
+pid = 0
+for rayfile in glob(rayfiles):
+    data = pickle.load(open(rayfile))
+    for i in range(len(data['rays'])):
+        if i%decimate == 0:
+            line = []#len(data['rays'][i])]
+            for j,pt in enumerate(data['rays'][i]):
+                points.append(np.array(pt)*spacing+origin)
+                #if j==0:
+                #    continue
+                line.append(pid)
+                pid +=1
+
+            line = np.array(line)
+            lines.insert_next_cell(line)
+
+#        connections.append(np.array(vertice_tmp))
+
+points = np.array(points)
+
+mesh = tvtk.PolyData()
+mesh.points = points
+mesh.verts = lines
+
+#src = mlab.pipeline.scallar_scatter(x,y,z)
+#src.mlab_source.dataset.lines = connections
+
+#lines = mlab.pipeline.stripper(src)
+
+mesh = tvtk.PolyData(points=points,lines=lines)
+
+outfile = outfile.split('.')[0] + '.vtp'
+w = tvtk.XMLPolyDataWriter(input=mesh, file_name=outfile)
+w.write()
+                              
+            
+
+## points = np.array([])
+
+## http://docs.enthought.com/mayavi/mayavi/auto/example_polydata.html
+
+## for rayfile in glob(rayfiles):
+
+##     data = pickle.load(open(rayfile))
+##     pid = 0
+##     for i in range(len(data['rays'])):
+##         pid2 = 0
+##         nbpoints = len(data['rays'][i])
+##         for j in range(nbpoints):
+##             Points.InsertPoint(j,data['rays'][i][j][0],
+##                                       data['rays'][i][j][1],
+##                                       data['rays'][i][j][2])
+
+##             if j == 0:
+##                 continue         
+
+##             line = vtk.vtkLine()
+##             line.GetPointIds().SetId(0,pid-1)
+##             line.GetPointIds().SetId(1,pid)
+
+##             Vertices.InsertNextCell(line)
+##             pid+=1
+
+
+## rays.SetPoints(Points)
+## rays.SetVerts(Vertices)
+## rays.Modified()
+
+## writer = vtk.vtkXMLPolyDataWriter()
+## outfile = args[1].split('.')[0] + '.vtp'
+## writer.SetFileName(outfile)
+## writer.SetInput(rays)
+## writer.Write()
+
+            
+    
+
