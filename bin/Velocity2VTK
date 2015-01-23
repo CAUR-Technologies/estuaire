@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+
+from evtk.hl import imageToVTK 
+import numpy as np
+from glob import glob
+import os
+from optparse import OptionParser
+
+parser = OptionParser(usage='%prog [options] infile(npy format) outfile(vti format) ')
+parser.add_option("-t", "--type", default='P',
+                  help = 'Velocity type (P or S)')
+parser.add_option("-q", "--qa", default='',
+                  help = 'path to checkerboard model file')
+parser.add_option("-m", "--mask", default='',
+                  help = 'path to sensitivity file (not active yet)')
+
+(opts, args) = parser.parse_args()
+
+infile = args[0].split('.')[0] + '.npy'
+outfile = args[1].split('.')[0]
+
+tp = opts.type
+qa = opts.qa
+
+try:
+    Vel = np.load(infile)
+except:
+    print 'Unable to open %s' %infile
+    exit()
+
+if opts.qa == '':
+    print 'No qa file provided, will not compute sensitivity'
+else:
+    try:
+        Qa = np.load(qa)
+    except:
+        Qa = []
+        print 'Unable to open %s\n Checkerboard model will not be included in the ouput' %infile
+
+[ny,nx,nz] = np.array(Vel.shape)
+N = np.array(Vel.shape)
+spcg = Vel.spacing
+(ox,oy,oz) = tuple(np.array(Vel.origin))
+
+
+vel_key = 'Vel_%s' %tp
+qa_key = 'Qa_%s' %tp
+
+imageToVTK(outfile,
+           origin=(ox,oy,oz),
+           spacing=(spcg,spcg,spcg),
+           cellData = {vel_key: Vel.data,
+                       qa_key: Qa.data})
+
+
+
+
+
