@@ -1,43 +1,35 @@
 #!/usr/bin/env python
 
-from evtk.hl import imageToVTK 
+from evtk.hl import imageToVTK
 import numpy as np
-from glob import glob
-import os
-from optparse import OptionParser
-
-parser = OptionParser(usage='%prog [options] infile(npy format) outfile(vti format) ')
-parser.add_option("-t", "--type", default='P',
-                  help = 'Velocity type (P or S)')
-
-(opts, args) = parser.parse_args()
-
-infile = args[0] # .split('.')[0] + '.npy'
-outfile = args[1] # .split('.')[0]
-
-tp = opts.type
-
-try:
-    Vel = np.load(infile)
-except:
-    print 'Unable to open %s' %infile
-    exit()
+import agstd.main as main
 
 
-[ny,nx,nz] = np.array(Vel.shape)
-N = np.array(Vel.shape)
-spcg = Vel.spacing
-(ox,oy,oz) = tuple(np.array(Vel.origin))
+def convert2VTK(idata, vtype, outfile):
+    """
+    :param idata: input data in EKImageData format
+    :param vtype: velocity type "P" or "S"
+    :param outfile: output filename
+    """
+    tp = vtype
+    Vel = idata
 
+    [ny, nx, nz] = np.array(Vel.shape)
+    if isinstance(Vel.spacing, tuple):
+        spcg = Vel.spacing[0]
+    else:
+        spcg = Vel.spacing
+    spcg = Vel.spacing
+    (ox, oy, oz) = tuple(np.array(Vel.origin))
 
-vel_key = 'Vel_%s' %tp
+    vel_key = 'Vel_%s' % tp
 
-imageToVTK(outfile,
-           origin=(ox,oy,oz),
-           spacing=(spcg,spcg,spcg),
-           cellData = {vel_key: Vel.data})
+    imageToVTK(outfile,
+               origin=(ox, oy, oz),
+               spacing=(spcg, spcg, spcg),
+               cellData = {vel_key: Vel.data})
 
-
-
+if __name__ == "__main__":
+    main.main(convert2VTK, idata=np.load, vtype=str, outfile=str)
 
 
