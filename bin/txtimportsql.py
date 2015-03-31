@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import eikonal.data as edata
 
 evdtype = [('id', 'S100'), ('pos', 'float', 3), ('delta_t', 'float')]

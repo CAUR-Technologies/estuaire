@@ -5,7 +5,7 @@ The enclosed PDE solver was developped to solve the Eikonal Equation subject to 
 .. math::
     |\Delta u(x)| = f(x)
 
-In its current state, it uses a second order derivative estimation in a Fast Marching Method iteration scheme. It is used in the forward modeling to simulate the propagation of wavefronts. The algorithm scale very badly on parallel architecture since it rely on the causality of the solution in an iterative scheme. The curent solution is limited to Regular grid with a constant spacing along axes.
+In its current state, it uses a second order derivative estimation in a Fast Marching Method iteration scheme. It is used in the forward modeling to simulate the propagation of wavefronts. The algorithm scale very badly on parallel architecture since it rely on the causality of the solution in an iterative scheme. The current solution is limited to Regular grid with a constant spacing along axes.
 
 Furthermore, the method needs a fully positive input grid to work correctly which is always the case for wavefront propagation with velocity.
 

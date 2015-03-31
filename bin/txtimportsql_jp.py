@@ -1,13 +1,11 @@
+#!/usr/bin/env python
 import eikonal.data as edata
+from IPython.core.debugger import Tracer
 
 evdtype = [('id', 'S100'), ('pos', 'float', 3), ('delta_t', 'float')]
 stdtype = evdtype
 
 ttdtype = [('stid', 'S100'), ('evid', 'S100'), ('tt', 'float')]
-
-
-
-
 
 def create_index(tt):
     ret = {}
@@ -26,12 +24,12 @@ import agstd.sdb.sqldbase as dbase
 
 
 
-whole_dtype = [ ('event_id', int),
-                ('station name','|S20'),
+whole_dtype = [('event_id', int),
+                ('station_name','|S20'),
                 ('station_pos', float, 3),
                 ('event_pos', float, 3),
                 ('traveltime', float),
-                ('date', '|S20'),
+                ('date', '|S50'),
                 ('type', '|S20')]
 
 def show_mlab(events, stations):
@@ -78,15 +76,15 @@ pick_query = \
 INSERT INTO pick(seismogram_id,type,date,frame) VALUES(?,?,?,?);
 """
 
-def add_station(db, stkey,stname):
-    cursor = db.execute("SELECT id FROM station WHERE name = %s", name)
-    stkey['name'] = stname
+
+def add_station(db, stname):
+    cursor = db.execute("SELECT id FROM station WHERE name = :name", stname)
     staid = cursor.fetchone()
     if staid is None:
         db.execute("INSERT INTO station(name, X, Y, Z) VALUES(:name,:X,:Y,:Z)", stname)
         staid = db.execute("SELECT last_insert_rowid() FROM station").fetchone()
 
-    return staid
+    return int(staid[0])
 
 def add_event(db, evkey, pos, discrepencies, date, lineid = None):
     evdict = {"id" : int(evkey),
@@ -166,6 +164,7 @@ def read_in_one_file(input, sqloutput, output_event = None, output_station = Non
     ev_table = []
     st_table = []
     tt_table = {}
+    stname = {}
     for i, line in enumerate(whole_table):
         evkey = line['event_id']
         stkey = tuple(line['station_pos'])
@@ -175,8 +174,12 @@ def read_in_one_file(input, sqloutput, output_event = None, output_station = Non
         if stkey not in stdict:
             stdict[stkey] = len(st_table)
             st_table.append((i, stkey, 0.0))
+        stname['name'] = line['station_name']
+        stname['X'] = line['station_pos'][0]
+        stname['Y'] = line['station_pos'][1]
+        stname['Z'] = line['station_pos'][2]
 
-        db_stid = add_station(db, stkey, line['station_name'])
+        db_stid = add_station(db, stname)
         db_evid = add_event(db, evkey, line['event_pos'], discrepencies, line['date'], lineid = i)
         tt_id = add_tt(db, db_evid, db_stid, line['traveltime'], "txt", line['type'])
 
