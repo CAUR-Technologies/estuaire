@@ -170,10 +170,10 @@ def read_in_one_file(input, sqloutput, output_event = None, output_station = Non
         stkey = tuple(line['station_pos'])
         if evkey not in evdict:
             evdict[evkey] = len(ev_table)
-            ev_table.append((evkey, line['event_pos'], 0.0))
+            ev_table.append(("",evkey, line['event_pos'], 0.0))
         if stkey not in stdict:
             stdict[stkey] = len(st_table)
-            st_table.append((i, stkey, 0.0))
+            st_table.append(("", i, stkey, 0.0))
         stname['name'] = line['station_name']
         stname['X'] = line['station_pos'][0]
         stname['Y'] = line['station_pos'][1]

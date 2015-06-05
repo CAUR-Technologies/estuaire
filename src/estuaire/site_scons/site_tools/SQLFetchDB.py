@@ -95,7 +95,7 @@ def SQLStation(target, source, env):
 
     station = conn.execute(builder.station_query(catalog = catalog)).fetchall()
 
-    station = [(s[0], (s[3], s[2], s[1]), 0) for s in station]
+    station = [(s[0], s[1], (s[4], s[3], s[2]), 0) for s in station]
 
     station = np.array(station, dtype = eikonal.data.st_dtype)
 
@@ -118,7 +118,7 @@ def SQLEvent(target, source, env):
 
     event = conn.execute(builder.event_query(catalog = catalog)).fetchall()
 
-    event = [(e[0], (e[3], e[2], e[1]), 0) for e in event]
+    event = [(e[0], e[1], (e[4], e[3], e[2]), 0) for e in event]
 
     event = np.array(event, dtype = eikonal.data.ev_dtype)
 

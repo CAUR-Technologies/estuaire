@@ -19,7 +19,8 @@ from agstd.decorators import memoize
 
 # This is the data description for the input array describing the event
 #
-ev_dtype = [('id',          'int'),
+ev_dtype = [('name',       'str'),
+            ('id',          'int'),
             ('position',    'float',    (3,)),
             ('delta_t',     'float')]
 
@@ -166,11 +167,11 @@ class EKImageData(object):
 
     def SaveNLL(self):
         pass
-        
+
     def LoadNLL(self):
         pass
 
-    ### ADDING method to save and load on data from/to NLL 
+    ### ADDING method to save and load on data from/to NLL
 
 
 

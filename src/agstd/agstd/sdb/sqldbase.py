@@ -104,13 +104,13 @@ __QUERY_ENDING__ = string.Template(
 
 __EVENT_QUERY__ = string.Template(
 """
-SELECT id, Z, Y, X FROM event WHERE id IN
+SELECT name, id, Z, Y, X FROM event WHERE id IN
     (SELECT event.id ${ending}) ORDER BY id;
 """)
 
 __STATION_QUERY__ = string.Template(
 """
-SELECT id, Z, Y, X FROM station WHERE id IN
+SELECT name, id, Z, Y, X FROM station WHERE id IN
     (SELECT station.id ${ending}) ORDER BY id;
 """)
 
@@ -119,7 +119,8 @@ __ORDER_BY_QUERY__ = string.Template(
 ORDER BY pick.type, station.id
 """)
 
-ev_dtype = [('id',          'int'),
+ev_dtype = [('name',        'str'),
+            ('id',          'int'),
             ('X',           'float'),
             ('Y',           'float'),
             ('Z',           'float')]
