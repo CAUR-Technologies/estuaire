@@ -106,7 +106,7 @@ struct FirstOrderSemiFiniteDifference
 template<FiniteDifferenceSide DSIDE>
 struct SecondOrderSemiFiniteDifference
 {
-    static const double mult = 1.5;
+    static constexpr double mult = 1.5;
     template <typename T, std::size_t D, bool BC>
     inline static double evaluate(const ArrayDescriptor<T, D, BC> &grid,
                                   const std::size_t dim,

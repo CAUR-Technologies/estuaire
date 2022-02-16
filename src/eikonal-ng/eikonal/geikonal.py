@@ -116,7 +116,7 @@ queue.enqueue(send_viscosity)
 
 kernel.setArgs(gpu_result, gpu_arrival, gpu_viscosity, shape[1])
 def eikonal():
-    for i in xrange(1000):
+    for i in range(1000):
         kernel.setArgs(gpu_result, gpu_arrival, gpu_viscosity, shape[1])
         queue.enqueue(eiko_cmd)
         queue.finish()

@@ -11,7 +11,10 @@ class txtsttable(object):
         self.index = create_index(self.data)
 
     def getTable(self):
-        ary = np.array([(i, e['pos'], e['delta_t']) for i, e in enumerate(self.data)], dtype = [('id', 'int'), ('position', 'float', 3), ('delta_t', 'float')])
+        ary = np.array([(i, e['pos'], e['delta_t']) for i, e in
+                        enumerate(self.data)],
+                       dtype = [('id', 'int'), ('position', 'float', 3),
+                                ('delta_t', 'float')])
         return ary
 
 class txttttable(object):
@@ -27,8 +30,12 @@ class txttttable(object):
         ary = []
         for sid, stt in zip(uniques, splitted):
             print sid, stindex[sid]
-            tttable = np.array([(-1, evindex[s['evid']], s['tt']) for s in stt], dtype = [('id', int), ('event_id', int), ('traveltime', float)])
-            ary.append(edata.EKTTTable(tttable, stindex[sid], evnfile = evnfile, stafile = stafile))
+            tttable = np.array([(-1, evindex[s['evid']], s['tt'])
+                                for s in stt], dtype = [('id', int),
+                                                        ('event_id', int),
+                                                        ('traveltime', float)])
+            ary.append(edata.EKTTTable(tttable, stindex[sid],
+                                       evnfile = evnfile, stafile = stafile))
         return ary
 
 

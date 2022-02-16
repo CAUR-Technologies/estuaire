@@ -100,11 +100,11 @@ def sensivity2(cnp.ndarray[double, ndim = 2, mode = 'c'] arrival not None,
     cvelocity.init(<size_t *>velocity.shape, <double *>velocity.data)
 
     cdef doublev2 cstart
-    for j in xrange(2):
+    for j in range(2):
         cstart.data[j] = start[j]
 
     cdef doublev2 cfinish
-    for j in xrange(2):
+    for j in range(2):
         cfinish.data[j] = finish[j]
 
 
@@ -132,11 +132,11 @@ def traveltime2(cnp.ndarray[double, ndim = 2, mode = 'c'] arrival not None,
     cvelocity.init(<size_t *>velocity.shape, <double *>velocity.data)
 
     cdef doublev2 cstart
-    for j in xrange(2):
+    for j in range(2):
         cstart.data[j] = start[j]
 
     cdef doublev2 cfinish
-    for j in xrange(2):
+    for j in range(2):
         cfinish.data[j] = finish[j]
 
     cdef double tt
@@ -166,11 +166,11 @@ def raytrace2(cnp.ndarray[double, ndim = 2, mode = 'c'] arrival not None,
     cpath.init(<size_t *>path.shape, <doublev2 *>path.data)
 
     cdef doublev2 cstart
-    for j in xrange(2):
+    for j in range(2):
         cstart.data[j] = start[j]
 
     cdef doublev2 cfinish
-    for j in xrange(2):
+    for j in range(2):
         cfinish.data[j] = finish[j]
 
     cdef double tt
@@ -278,11 +278,11 @@ def sensivity3(cnp.ndarray[double, ndim = 3, mode = 'c'] arrival not None,
     cvelocity.init(<size_t *>velocity.shape, <double *>velocity.data)
 
     cdef doublev3 cstart
-    for j in xrange(3):
+    for j in range(3):
         cstart.data[j] = start[j]
 
     cdef doublev3 cfinish
-    for j in xrange(3):
+    for j in range(3):
         cfinish.data[j] = finish[j]
 
 
@@ -310,11 +310,11 @@ def traveltime3(cnp.ndarray[double, ndim = 3, mode = 'c'] arrival not None,
     cvelocity.init(<size_t *>velocity.shape, <double *>velocity.data)
 
     cdef doublev3 cstart
-    for j in xrange(3):
+    for j in range(3):
         cstart.data[j] = start[j]
 
     cdef doublev3 cfinish
-    for j in xrange(3):
+    for j in range(3):
         cfinish.data[j] = finish[j]
 
     cdef double tt
@@ -344,11 +344,11 @@ def raytrace3(cnp.ndarray[double, ndim = 3, mode = 'c'] arrival not None,
     cpath.init(<size_t *>path.shape, <doublev3 *>path.data)
 
     cdef doublev3 cstart
-    for j in xrange(3):
+    for j in range(3):
         cstart.data[j] = start[j]
 
     cdef doublev3 cfinish
-    for j in xrange(3):
+    for j in range(3):
         cfinish.data[j] = finish[j]
 
     cdef double tt
@@ -413,7 +413,7 @@ def traveltime(cnp.ndarray arrival, cnp.ndarray velocity, *args, **kw):
     """
     if arrival.ndim != velocity.ndim:
         raise ValueError("Velocity and Arrival grids must have the same dimensions")
-    for i in xrange(arrival.ndim):
+    for i in range(arrival.ndim):
         if arrival.shape[i] != velocity.shape[i]:
             raise ValueError("Velocity and Arrival Grid must have the same shape")
 
@@ -430,7 +430,7 @@ def raytrace(cnp.ndarray arrival, cnp.ndarray velocity, *args, **kw):
     """
     if arrival.ndim != velocity.ndim:
         raise ValueError("Velocity and Arrival grids must have the same dimensions")
-    for i in xrange(arrival.ndim):
+    for i in range(arrival.ndim):
         if arrival.shape[i] != velocity.shape[i]:
             raise ValueError("Velocity and Arrival Grid must have the same shape")
 
@@ -447,7 +447,7 @@ def sensivity(cnp.ndarray arrival, cnp.ndarray velocity, *args, **kw):
     """
     if arrival.ndim != velocity.ndim:
         raise ValueError("Velocity and Arrival grids must have the same dimensions")
-    for i in xrange(arrival.ndim):
+    for i in range(arrival.ndim):
         if arrival.shape[i] != velocity.shape[i]:
             raise ValueError("Velocity and Arrival Grid must have the same shape")
 

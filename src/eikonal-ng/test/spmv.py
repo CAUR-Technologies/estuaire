@@ -15,11 +15,12 @@ q = c.createCommandQueue(d)
 
 size = 64 * 64 * 64
 
-sp = sc.sparse.dia_matrix((([1] * size, [1] * size, [1] * size), (-1, 0, 1)), shape = (size, size), dtype = 'float32').tocsr()
+sp = sc.sparse.dia_matrix((([1] * size, [1] * size, [1] * size), (-1, 0, 1)),
+                          shape=(size, size), dtype='float32').tocsr()
 gpu_sp = clmath.CLCSRMatrix(c, sp)
 
-a = clmath.GPULinkedArray(c, np.ones(size, dtype = 'float32'))
-b = clmath.GPULinkedArray(c, np.ones(size, dtype = 'float32'))
+a = clmath.GPULinkedArray(c, np.ones(size, dtype='float32'))
+b = clmath.GPULinkedArray(c, np.ones(size, dtype='float32'))
 
 q.enqueue(a.send() + gpu_sp.send())
 q.enqueue(clmath.spmv(gpu_sp, b.GPU, a.GPU) + clmath.dot(a.GPU, b.GPU, b.GPU))

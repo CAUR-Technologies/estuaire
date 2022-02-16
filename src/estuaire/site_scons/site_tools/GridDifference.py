@@ -35,7 +35,7 @@ def GridDifference(source, target, env):
     shape = source[0].value
     output = str(target[0])
 
-    d, dd = linear.linearDerivativeOP(shape)
+    d, dd = linear.linear_derivative_op(shape)
 
     pickle.dump(d * eta[0] + 0.5 * eta[1] * dd, open(output, 'w'),
                 protocol = pickle.HIGHEST_PROTOCOL)

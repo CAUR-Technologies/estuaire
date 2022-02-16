@@ -86,7 +86,8 @@ class EKPunctualData(object):
         except ValueError, e:
             self.data = np.asarray(data, dtype = self.dtype)
 
-        self.origin = tuple([0] * data['position'].shape[-1]) if origin is None else origin
+        self.origin = tuple([0] * data['position'].shape[-1]) \
+            if origin is None else origin
         self.scale = scale
 
     def __get_position_zyx__(self):

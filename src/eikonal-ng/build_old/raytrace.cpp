@@ -724,7 +724,7 @@ static __Pyx_TypeInfo __Pyx_TypeInfo_size_t = { "size_t", NULL, sizeof(size_t), 
 int __pyx_module_is_main_eikonal__raytrace = 0;
 
 /* Implementation of eikonal.raytrace */
-static PyObject *__pyx_builtin_xrange;
+static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_RuntimeError;
@@ -787,7 +787,7 @@ static char __pyx_k__start[] = "start";
 static char __pyx_k__fields[] = "fields";
 static char __pyx_k__finish[] = "finish";
 static char __pyx_k__format[] = "format";
-static char __pyx_k__xrange[] = "xrange";
+static char __pyx_k__range[] = "range";
 static char __pyx_k____doc__[] = "__doc__";
 static char __pyx_k__arrival[] = "arrival";
 static char __pyx_k__indices[] = "indices";
@@ -891,7 +891,7 @@ static PyObject *__pyx_n_s__traveltime2;
 static PyObject *__pyx_n_s__traveltime3;
 static PyObject *__pyx_n_s__type_num;
 static PyObject *__pyx_n_s__velocity;
-static PyObject *__pyx_n_s__xrange;
+static PyObject *__pyx_n_s__range;
 static PyObject *__pyx_int_15;
 
 /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":50
@@ -1131,7 +1131,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity2(PyObject *__pyx_self, Py
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":103
  * 
  *     cdef doublev2 cstart
- *     for j in xrange(2):             # <<<<<<<<<<<<<<
+ *     for j in range(2):             # <<<<<<<<<<<<<<
  *         cstart.data[j] = start[j]
  * 
  */
@@ -1140,7 +1140,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity2(PyObject *__pyx_self, Py
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":104
  *     cdef doublev2 cstart
- *     for j in xrange(2):
+ *     for j in range(2):
  *         cstart.data[j] = start[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef doublev2 cfinish
@@ -1155,7 +1155,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity2(PyObject *__pyx_self, Py
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":107
  * 
  *     cdef doublev2 cfinish
- *     for j in xrange(2):             # <<<<<<<<<<<<<<
+ *     for j in range(2):             # <<<<<<<<<<<<<<
  *         cfinish.data[j] = finish[j]
  * 
  */
@@ -1164,7 +1164,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity2(PyObject *__pyx_self, Py
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":108
  *     cdef doublev2 cfinish
- *     for j in xrange(2):
+ *     for j in range(2):
  *         cfinish.data[j] = finish[j]             # <<<<<<<<<<<<<<
  * 
  * 
@@ -1450,7 +1450,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime2(PyObject *__pyx_self, P
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":135
  * 
  *     cdef doublev2 cstart
- *     for j in xrange(2):             # <<<<<<<<<<<<<<
+ *     for j in range(2):             # <<<<<<<<<<<<<<
  *         cstart.data[j] = start[j]
  * 
  */
@@ -1459,7 +1459,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime2(PyObject *__pyx_self, P
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":136
  *     cdef doublev2 cstart
- *     for j in xrange(2):
+ *     for j in range(2):
  *         cstart.data[j] = start[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef doublev2 cfinish
@@ -1474,7 +1474,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime2(PyObject *__pyx_self, P
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":139
  * 
  *     cdef doublev2 cfinish
- *     for j in xrange(2):             # <<<<<<<<<<<<<<
+ *     for j in range(2):             # <<<<<<<<<<<<<<
  *         cfinish.data[j] = finish[j]
  * 
  */
@@ -1483,7 +1483,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime2(PyObject *__pyx_self, P
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":140
  *     cdef doublev2 cfinish
- *     for j in xrange(2):
+ *     for j in range(2):
  *         cfinish.data[j] = finish[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef double tt
@@ -1770,7 +1770,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace2(PyObject *__pyx_self, PyO
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":169
  * 
  *     cdef doublev2 cstart
- *     for j in xrange(2):             # <<<<<<<<<<<<<<
+ *     for j in range(2):             # <<<<<<<<<<<<<<
  *         cstart.data[j] = start[j]
  * 
  */
@@ -1779,7 +1779,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace2(PyObject *__pyx_self, PyO
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":170
  *     cdef doublev2 cstart
- *     for j in xrange(2):
+ *     for j in range(2):
  *         cstart.data[j] = start[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef doublev2 cfinish
@@ -1794,7 +1794,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace2(PyObject *__pyx_self, PyO
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":173
  * 
  *     cdef doublev2 cfinish
- *     for j in xrange(2):             # <<<<<<<<<<<<<<
+ *     for j in range(2):             # <<<<<<<<<<<<<<
  *         cfinish.data[j] = finish[j]
  * 
  */
@@ -1803,7 +1803,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace2(PyObject *__pyx_self, PyO
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":174
  *     cdef doublev2 cfinish
- *     for j in xrange(2):
+ *     for j in range(2):
  *         cfinish.data[j] = finish[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef double tt
@@ -2611,7 +2611,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity3(PyObject *__pyx_self, Py
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":281
  * 
  *     cdef doublev3 cstart
- *     for j in xrange(3):             # <<<<<<<<<<<<<<
+ *     for j in range(3):             # <<<<<<<<<<<<<<
  *         cstart.data[j] = start[j]
  * 
  */
@@ -2620,7 +2620,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity3(PyObject *__pyx_self, Py
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":282
  *     cdef doublev3 cstart
- *     for j in xrange(3):
+ *     for j in range(3):
  *         cstart.data[j] = start[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef doublev3 cfinish
@@ -2635,7 +2635,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity3(PyObject *__pyx_self, Py
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":285
  * 
  *     cdef doublev3 cfinish
- *     for j in xrange(3):             # <<<<<<<<<<<<<<
+ *     for j in range(3):             # <<<<<<<<<<<<<<
  *         cfinish.data[j] = finish[j]
  * 
  */
@@ -2644,7 +2644,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity3(PyObject *__pyx_self, Py
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":286
  *     cdef doublev3 cfinish
- *     for j in xrange(3):
+ *     for j in range(3):
  *         cfinish.data[j] = finish[j]             # <<<<<<<<<<<<<<
  * 
  * 
@@ -2934,7 +2934,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime3(PyObject *__pyx_self, P
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":313
  * 
  *     cdef doublev3 cstart
- *     for j in xrange(3):             # <<<<<<<<<<<<<<
+ *     for j in range(3):             # <<<<<<<<<<<<<<
  *         cstart.data[j] = start[j]
  * 
  */
@@ -2943,7 +2943,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime3(PyObject *__pyx_self, P
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":314
  *     cdef doublev3 cstart
- *     for j in xrange(3):
+ *     for j in range(3):
  *         cstart.data[j] = start[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef doublev3 cfinish
@@ -2958,7 +2958,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime3(PyObject *__pyx_self, P
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":317
  * 
  *     cdef doublev3 cfinish
- *     for j in xrange(3):             # <<<<<<<<<<<<<<
+ *     for j in range(3):             # <<<<<<<<<<<<<<
  *         cfinish.data[j] = finish[j]
  * 
  */
@@ -2967,7 +2967,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime3(PyObject *__pyx_self, P
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":318
  *     cdef doublev3 cfinish
- *     for j in xrange(3):
+ *     for j in range(3):
  *         cfinish.data[j] = finish[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef double tt
@@ -3258,7 +3258,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace3(PyObject *__pyx_self, PyO
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":347
  * 
  *     cdef doublev3 cstart
- *     for j in xrange(3):             # <<<<<<<<<<<<<<
+ *     for j in range(3):             # <<<<<<<<<<<<<<
  *         cstart.data[j] = start[j]
  * 
  */
@@ -3267,7 +3267,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace3(PyObject *__pyx_self, PyO
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":348
  *     cdef doublev3 cstart
- *     for j in xrange(3):
+ *     for j in range(3):
  *         cstart.data[j] = start[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef doublev3 cfinish
@@ -3282,7 +3282,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace3(PyObject *__pyx_self, PyO
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":351
  * 
  *     cdef doublev3 cfinish
- *     for j in xrange(3):             # <<<<<<<<<<<<<<
+ *     for j in range(3):             # <<<<<<<<<<<<<<
  *         cfinish.data[j] = finish[j]
  * 
  */
@@ -3291,7 +3291,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace3(PyObject *__pyx_self, PyO
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":352
  *     cdef doublev3 cfinish
- *     for j in xrange(3):
+ *     for j in range(3):
  *         cfinish.data[j] = finish[j]             # <<<<<<<<<<<<<<
  * 
  *     cdef double tt
@@ -3952,7 +3952,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime(PyObject *__pyx_self, Py
  *     """
  *     if arrival.ndim != velocity.ndim:             # <<<<<<<<<<<<<<
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  */
   __pyx_t_1 = (__pyx_v_arrival->nd != __pyx_v_velocity->nd);
   if (__pyx_t_1) {
@@ -3961,7 +3961,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime(PyObject *__pyx_self, Py
  *     """
  *     if arrival.ndim != velocity.ndim:
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")             # <<<<<<<<<<<<<<
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if arrival.shape[i] != velocity.shape[i]:
  */
     __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 415; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -3982,7 +3982,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime(PyObject *__pyx_self, Py
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":416
  *     if arrival.ndim != velocity.ndim:
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")
- *     for i in xrange(arrival.ndim):             # <<<<<<<<<<<<<<
+ *     for i in range(arrival.ndim):             # <<<<<<<<<<<<<<
  *         if arrival.shape[i] != velocity.shape[i]:
  *             raise ValueError("Velocity and Arrival Grid must have the same shape")
  */
@@ -3992,7 +3992,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime(PyObject *__pyx_self, Py
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":417
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if arrival.shape[i] != velocity.shape[i]:             # <<<<<<<<<<<<<<
  *             raise ValueError("Velocity and Arrival Grid must have the same shape")
  * 
@@ -4001,7 +4001,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_traveltime(PyObject *__pyx_self, Py
     if (__pyx_t_1) {
 
       /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":418
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if arrival.shape[i] != velocity.shape[i]:
  *             raise ValueError("Velocity and Arrival Grid must have the same shape")             # <<<<<<<<<<<<<<
  * 
@@ -4220,7 +4220,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace(PyObject *__pyx_self, PyOb
  *     """
  *     if arrival.ndim != velocity.ndim:             # <<<<<<<<<<<<<<
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  */
   __pyx_t_1 = (__pyx_v_arrival->nd != __pyx_v_velocity->nd);
   if (__pyx_t_1) {
@@ -4229,7 +4229,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace(PyObject *__pyx_self, PyOb
  *     """
  *     if arrival.ndim != velocity.ndim:
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")             # <<<<<<<<<<<<<<
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if arrival.shape[i] != velocity.shape[i]:
  */
     __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 432; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -4250,7 +4250,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace(PyObject *__pyx_self, PyOb
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":433
  *     if arrival.ndim != velocity.ndim:
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")
- *     for i in xrange(arrival.ndim):             # <<<<<<<<<<<<<<
+ *     for i in range(arrival.ndim):             # <<<<<<<<<<<<<<
  *         if arrival.shape[i] != velocity.shape[i]:
  *             raise ValueError("Velocity and Arrival Grid must have the same shape")
  */
@@ -4260,7 +4260,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace(PyObject *__pyx_self, PyOb
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":434
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if arrival.shape[i] != velocity.shape[i]:             # <<<<<<<<<<<<<<
  *             raise ValueError("Velocity and Arrival Grid must have the same shape")
  * 
@@ -4269,7 +4269,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_raytrace(PyObject *__pyx_self, PyOb
     if (__pyx_t_1) {
 
       /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":435
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if arrival.shape[i] != velocity.shape[i]:
  *             raise ValueError("Velocity and Arrival Grid must have the same shape")             # <<<<<<<<<<<<<<
  * 
@@ -4488,7 +4488,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity(PyObject *__pyx_self, PyO
  *     """
  *     if arrival.ndim != velocity.ndim:             # <<<<<<<<<<<<<<
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  */
   __pyx_t_1 = (__pyx_v_arrival->nd != __pyx_v_velocity->nd);
   if (__pyx_t_1) {
@@ -4497,7 +4497,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity(PyObject *__pyx_self, PyO
  *     """
  *     if arrival.ndim != velocity.ndim:
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")             # <<<<<<<<<<<<<<
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if arrival.shape[i] != velocity.shape[i]:
  */
     __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -4518,7 +4518,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity(PyObject *__pyx_self, PyO
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":450
  *     if arrival.ndim != velocity.ndim:
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")
- *     for i in xrange(arrival.ndim):             # <<<<<<<<<<<<<<
+ *     for i in range(arrival.ndim):             # <<<<<<<<<<<<<<
  *         if arrival.shape[i] != velocity.shape[i]:
  *             raise ValueError("Velocity and Arrival Grid must have the same shape")
  */
@@ -4528,7 +4528,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity(PyObject *__pyx_self, PyO
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":451
  *         raise ValueError("Velocity and Arrival grids must have the same dimensions")
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if arrival.shape[i] != velocity.shape[i]:             # <<<<<<<<<<<<<<
  *             raise ValueError("Velocity and Arrival Grid must have the same shape")
  * 
@@ -4537,7 +4537,7 @@ static PyObject *__pyx_pf_7eikonal_8raytrace_sensivity(PyObject *__pyx_self, PyO
     if (__pyx_t_1) {
 
       /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/raytrace.pyx":452
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if arrival.shape[i] != velocity.shape[i]:
  *             raise ValueError("Velocity and Arrival Grid must have the same shape")             # <<<<<<<<<<<<<<
  * 
@@ -7036,14 +7036,14 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s__traveltime3, __pyx_k__traveltime3, sizeof(__pyx_k__traveltime3), 0, 0, 1, 1},
   {&__pyx_n_s__type_num, __pyx_k__type_num, sizeof(__pyx_k__type_num), 0, 0, 1, 1},
   {&__pyx_n_s__velocity, __pyx_k__velocity, sizeof(__pyx_k__velocity), 0, 0, 1, 1},
-  {&__pyx_n_s__xrange, __pyx_k__xrange, sizeof(__pyx_k__xrange), 0, 0, 1, 1},
+  {&__pyx_n_s__range, __pyx_k__range, sizeof(__pyx_k__range), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
   #if PY_MAJOR_VERSION >= 3
-  __pyx_builtin_xrange = __Pyx_GetName(__pyx_b, __pyx_n_s__range); if (!__pyx_builtin_xrange) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 103; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetName(__pyx_b, __pyx_n_s__range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 103; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   #else
-  __pyx_builtin_xrange = __Pyx_GetName(__pyx_b, __pyx_n_s__xrange); if (!__pyx_builtin_xrange) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 103; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetName(__pyx_b, __pyx_n_s__range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 103; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   #endif
   __pyx_builtin_ValueError = __Pyx_GetName(__pyx_b, __pyx_n_s__ValueError); if (!__pyx_builtin_ValueError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 415; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_range = __Pyx_GetName(__pyx_b, __pyx_n_s__range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[1]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}

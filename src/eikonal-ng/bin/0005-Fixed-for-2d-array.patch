@@ -55,7 +55,7 @@ index c7b6524..7377eab 100755
 @@ -73,7 +74,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
                  "description" : description}
  
-     for i in xrange(len(current_events)):
+     for i in range(len(current_events)):
 -        finish = tuple(arrival.transform_to(current_events[i]['position']))
 +        finish = tuple(arrival.transform_to(current_events[i]['position'][:len(arrival.shape)]))
          rtt, ind, sens = raytrace.sensivity(agrid, vgrid, start, finish,

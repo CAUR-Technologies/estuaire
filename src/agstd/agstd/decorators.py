@@ -3,17 +3,15 @@
 #
 # vim: ts=4 sw=4 sts=0 noexpandtab:
 import logging
-import traceback
-import new
 import os
 import time
 
 from functools import wraps
-from itertools import izip
 
 import numpy
 
 logger = logging.getLogger(__name__)
+
 
 class buggy(object):
     """
@@ -106,7 +104,7 @@ def addmethod(instance):
 
 class memoizehd(object):
     """
-    This is a decorator wich is designed to cache to a file the 
+    This is a decorator which is designed to cache to a file the
     result of a function. This function calculate a hash from the
     function and the parameters and store the result in a designed
     file. ONLY WORK WITH SCIPY/NUMPY ARRAY AND WITH HASHABLE PARAMETERS

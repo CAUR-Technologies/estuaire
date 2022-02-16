@@ -65,9 +65,9 @@ def linearFilter3(stencil, shape):
     dias = []
     poss = []
 
-    for k, z in enumerate(xrange(-Zmin, Zmin + 1)):
-        for j, y in enumerate(xrange(-Ymin, Ymin + 1)):
-            for i, x in enumerate(xrange(-Xmin, Xmin + 1)):
+    for k, z in enumerate(range(-Zmin, Zmin + 1)):
+        for j, y in enumerate(range(-Ymin, Ymin + 1)):
+            for i, x in enumerate(range(-Xmin, Xmin + 1)):
                 pos = z * shape[-1] * shape[-2] + y * shape[-1] + x
                 dias.append([0.0] * Xmin + [stencil[k, j, i]] * (shape[-1] - 2 * Xmin) + [0.0] * Xmin)
                 dias[-1] = [0.0] * (shape[2] * Ymin) + dias[-1] * (shape[1] - 2 * Ymin) + [0.0] * (shape[2] * Ymin)
@@ -247,9 +247,9 @@ def linearFilter3(stencil, shape):
     dias = []
     poss = []
 
-    for k, z in enumerate(xrange(-Zmin, Zmin + 1)):
-        for j, y in enumerate(xrange(-Ymin, Ymin + 1)):
-            for i, x in enumerate(xrange(-Xmin, Xmin + 1)):
+    for k, z in enumerate(range(-Zmin, Zmin + 1)):
+        for j, y in enumerate(range(-Ymin, Ymin + 1)):
+            for i, x in enumerate(range(-Xmin, Xmin + 1)):
                 pos = z * shape[-1] * shape[-2] + y * shape[-1] + x
                 dias.append([0.0] * Xmin + [stencil[k, j, i]] * (shape[-1] - 2 * Xmin) + [0.0] * Xmin)
                 dias[-1] = [0.0] * (shape[2] * Ymin) + dias[-1] * (shape[1] - 2 * Ymin) + [0.0] * (shape[2] * Ymin)
@@ -308,8 +308,8 @@ class CGInversion(object):
             yield m, 0
             return
 
-        for i in xrange(maxiter / batch):
-            for j in xrange(batch):
+        for i in range(maxiter / batch):
+            for j in range(batch):
                 # This line calculate the first half of the hessian
                 ridot = np.dot(ri, ri)
 

@@ -10,7 +10,7 @@ __doc__ = """
 
 import inspect
 import argparse
-import cPickle as pickle
+import pickle
 
 import os
 import sys

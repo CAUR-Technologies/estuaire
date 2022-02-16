@@ -14,45 +14,44 @@ import scipy as sc
 import scipy.sparse
 
 
-stencil_D2D = np.array([[[ 1,  0, -1],
-                        [ 0,  0,  0],
-                        [ 1,  0, -1]]])
+stencil_D2D = np.array([[[1,  0, -1],
+                        [0,  0,  0],
+                        [1,  0, -1]]])
 
-stencil_DD2D = np.array([[[ 0,  1,  0],
-                         [ 1,  -4,  1],
-                         [ 0,  1,  0]]])
+stencil_DD2D = np.array([[[0,  1,  0],
+                         [1,  -4,  1],
+                         [0,  1,  0]]])
 
-stencil_D3D = np.array([[[ 1,  0,  1],
-                         [ 0,  0,  0],
-                         [ 1,  0,  0]],
-                        [[ 0,  0,  0],
-                         [ 0,  0,  0],
-                         [ 0,  0,  0]],
-                        [[ 0,  0,  0],
-                         [ 0,  0,  0],
-                         [ 0,  0,  0]],
-                        [[ 0,  0, -1],
-                         [ 0,  0,  0],
+stencil_D3D = np.array([[[1,  0,  1],
+                         [0,  0,  0],
+                         [1,  0,  0]],
+                        [[0,  0,  0],
+                         [0,  0,  0],
+                         [0,  0,  0]],
+                        [[0,  0,  0],
+                         [0,  0,  0],
+                         [0,  0,  0]],
+                        [[0,  0, -1],
+                         [0,  0,  0],
                          [-1,  0, -1]]])
 
-stencil_DD3D = np.array([[[ 0,  0,  0],
-                          [ 0,  1,  0],
-                          [ 0,  0,  0]],
-                         [[ 0,  1,  0],
-                          [ 1,  -6,  1],
-                          [ 0,  1,  0]],
-                         [[ 0,  0,  0],
-                          [ 0,  1,  0],
-                          [ 0,  0,  0]]])
+stencil_DD3D = np.array([[[0,  0,  0],
+                          [0,  1,  0],
+                          [0,  0,  0]],
+                         [[0,  1,  0],
+                          [1,  -6,  1],
+                          [0,  1,  0]],
+                         [[0,  0,  0],
+                          [0,  1,  0],
+                          [0,  0,  0]]])
 
 
-stencils_dict = { 2 : [stencil_D2D, stencil_DD2D],
-                  3 : [stencil_D3D, stencil_DD3D] }
-
+stencils_dict = {2: [stencil_D2D, stencil_DD2D],
+                 3: [stencil_D3D, stencil_DD3D] }
 
 
 def linearFilter2(stencil, shape):
-    return linearFilter3(np.array([stencil]), (1,) + shape)
+    return linear_filter3(np.array([stencil]), (1,) + shape)
 
 
 def linearFilter3(stencil, shape):
@@ -65,23 +64,27 @@ def linearFilter3(stencil, shape):
     dias = []
     poss = []
 
-    for k, z in enumerate(xrange(-Zmin, Zmin + 1)):
-        for j, y in enumerate(xrange(-Ymin, Ymin + 1)):
-            for i, x in enumerate(xrange(-Xmin, Xmin + 1)):
+    for k, z in enumerate(range(-Zmin, Zmin + 1)):
+        for j, y in enumerate(range(-Ymin, Ymin + 1)):
+            for i, x in enumerate(range(-Xmin, Xmin + 1)):
                 pos = z * shape[-1] * shape[-2] + y * shape[-1] + x
-                dias.append([0.0] * Xmin + [stencil[k, j, i]] * (shape[-1] - 2 * Xmin) + [0.0] * Xmin)
-                dias[-1] = [0.0] * (shape[2] * Ymin) + dias[-1] * (shape[1] - 2 * Ymin) + [0.0] * (shape[2] * Ymin)
-                dias[-1] = [0.0] * (shape[2] * shape[1]) * Zmin + dias[-1] * (shape[0] - 2 * Zmin) + [0.0] * (shape[2] * shape[1]) * Zmin
+                dias.append([0.0] * Xmin + [stencil[k, j, i]] *
+                            (shape[-1] - 2 * Xmin) + [0.0] * Xmin)
+                dias[-1] = [0.0] * (shape[2] * Ymin) + dias[-1] * \
+                           (shape[1] - 2 * Ymin) + [0.0] * (shape[2] * Ymin)
+                dias[-1] = [0.0] * (shape[2] * shape[1]) * Zmin + dias[-1] * \
+                           (shape[0] - 2 * Zmin) + [0.0] * \
+                           (shape[2] * shape[1]) * Zmin
                 if pos != 0:
                     dias[-1] = dias[-1][-pos:] + dias[-1][:-pos]
                 poss.append(pos)
-    return sc.sparse.dia_matrix((dias, poss), (size, size), dtype = 'float')
+    return sc.sparse.dia_matrix((dias, poss), (size, size), dtype='float')
 
 
 def linearDerivativeOP(shape):
     stencils = stencils_dict[len(shape)]
     shape = shape if len(shape) == 3 else (1,) + shape
-    return [linearFilter3(stencil, shape) for stencil in stencils]
+    return [linear_filter3(stencil, shape) for stencil in stencils]
 
 
 def laplaceOP(X, Y, Z):
@@ -91,9 +94,8 @@ def laplaceOP(X, Y, Z):
     left = ([-1] * (X - 1) + [0]) * Y * Z
 
     d2x = sc.sparse.dia_matrix(([left, center, right], [-1.0, 0.0, 1.0]),
-                              (size, size),
-                              dtype = 'float')
-
+                               (size, size),
+                               dtype='float')
 
     if Y == 1:
         d2y = sc.sparse.eye(size, size) * 0
@@ -103,8 +105,8 @@ def laplaceOP(X, Y, Z):
         left = ([-1] * X * (Y - 1) + [0] * X) * Z
 
         d2y = sc.sparse.dia_matrix(([left, center, right], [-X, 0.0, +X]),
-                                  (size, size),
-                                  dtype = 'float')
+                                   (size, size),
+                                   dtype='float')
 
     if Z == 1:
         d2z = sc.sparse.eye(size, size) * 0
@@ -114,14 +116,13 @@ def laplaceOP(X, Y, Z):
         left = [-1] * X * Y * (Z - 1) + [0] * X * Y
 
         d2z = sc.sparse.dia_matrix(([left, center, right], [-X, 0.0, +X]),
-                                  (size, size),
-                                  dtype = 'float')
-
-           
+                                   (size, size),
+                                   dtype='float')
 
     return d2x + d2y + d2z
 
-def linearXDerivativeOP(X, Y, Z):
+
+def linear_x_derivative_op(X, Y, Z):
     """
     This method calculate the linear operator for the first and second
     derivatives of a 3D grid in the X direction. (Z = 1) for the 2D one
@@ -148,7 +149,8 @@ def linearXDerivativeOP(X, Y, Z):
 
     return d,  d2
 
-def linearYDerivativeOP(X, Y, Z):
+
+def linear_y_derivative_op(X, Y, Z):
     """
     This method calculate the linear operator for the first and second
     partial derivatives of a 3D grid in the Y dii=rection. (Z = 1) for
@@ -165,7 +167,7 @@ def linearYDerivativeOP(X, Y, Z):
 
     d = sc.sparse.dia_matrix(([left, center, right], [-X, 0, X]),
                              (size, size),
-                             dtype = 'float')
+                             dtype='float')
 
     center = ([0] * X + [-2] * X * (Y - 2) + [0] * X) * Z
     right = ([0, 0] * X  + [1] * X * (Y - 2)) * Z
@@ -173,10 +175,11 @@ def linearYDerivativeOP(X, Y, Z):
 
     dd = sc.sparse.dia_matrix(([left, center, right], [-X, 0.0, +X]),
                               (size, size),
-                              dtype = 'float')
+                              dtype='float')
     return d, dd 
 
-def linearZDerivativeOP(X, Y, Z):
+
+def linear_z_derivative_op(X, Y, Z):
     """
     This method calculate the linear operator for the first and second
     partial derivatives of a 3D grid in the Z direction. (Z = 1) for
@@ -203,41 +206,45 @@ def linearZDerivativeOP(X, Y, Z):
 
     return d, dd
 
+
 def uniform_weight(residual):
     return sc.sparse.eye(residual.size, residual.size)
 
+
 class GaussianWeight(object):
-    def __init__(self, sigma = 0):
+    def __init__(self, sigma=0):
         self.sigma = sigma
 
     def __call__(self, residual):
         var = np.var(residual)
         weights = np.exp(-0.5 * residual ** 2 / var)
-        threshold = np.exp(-0.5 *  self.sigma ** 2)
+        threshold = np.exp(-0.5 * self.sigma ** 2)
         tweights = np.where(weights > threshold, threshold, weights)
         return sc.sparse.dia_matrix((tweights / threshold, (0, )), shape = (residual.size, residual.size))
 
+
 class BoxWeight(object):
-    def __init__(self, sigma = 0):
+    def __init__(self, sigma=0):
         self.sigma = sigma
 
     def __call__(self, residual):
         var = np.var(residual)
         weights = np.exp(-0.5 * residual ** 2 / var)
-        threshold = np.exp(-0.5 *  self.sigma ** 2)
+        threshold = np.exp(-0.5 * self.sigma ** 2)
         tweights = np.where(weights > threshold, threshold, 0)
-        return sc.sparse.dia_matrix((tweights / threshold, (0, )), shape = (residual.size, residual.size))
+        return sc.sparse.dia_matrix((tweights / threshold, (0, )),
+                                    shape=(residual.size, residual.size))
 
 
-stencils_dict = { 2 : [stencil_D2D, stencil_DD2D],
-                  3 : [stencil_D3D, stencil_DD3D] }
+stencils_dict = {2: [stencil_D2D, stencil_DD2D],
+                 3: [stencil_D3D, stencil_DD3D] }
 
 
-def linearFilter2(stencil, shape):
-    return linearFilter3(np.array([stencil]), (1,) + shape)
+def linear_filter2(stencil, shape):
+    return linear_filter3(np.array([stencil]), (1,) + shape)
 
 
-def linearFilter3(stencil, shape):
+def linear_filter3(stencil, shape):
     size = np.prod(shape)
     Xmin = (stencil.shape[2] - 1) / 2
     Ymin = (stencil.shape[1] - 1) / 2
@@ -247,29 +254,30 @@ def linearFilter3(stencil, shape):
     dias = []
     poss = []
 
-    for k, z in enumerate(xrange(-Zmin, Zmin + 1)):
-        for j, y in enumerate(xrange(-Ymin, Ymin + 1)):
-            for i, x in enumerate(xrange(-Xmin, Xmin + 1)):
+    for k, z in enumerate(range(-Zmin, Zmin + 1)):
+        for j, y in enumerate(range(-Ymin, Ymin + 1)):
+            for i, x in enumerate(range(-Xmin, Xmin + 1)):
                 pos = z * shape[-1] * shape[-2] + y * shape[-1] + x
-                dias.append([0.0] * Xmin + [stencil[k, j, i]] * (shape[-1] - 2 * Xmin) + [0.0] * Xmin)
-                dias[-1] = [0.0] * (shape[2] * Ymin) + dias[-1] * (shape[1] - 2 * Ymin) + [0.0] * (shape[2] * Ymin)
-                dias[-1] = [0.0] * (shape[2] * shape[1]) * Zmin + dias[-1] * (shape[0] - 2 * Zmin) + [0.0] * (shape[2] * shape[1]) * Zmin
+                dias.append([0.0] * Xmin + [stencil[k, j, i]] *
+                            (shape[-1] - 2 * Xmin) + [0.0] * Xmin)
+                dias[-1] = [0.0] * (shape[2] * Ymin) + dias[-1] * \
+                           (shape[1] - 2 * Ymin) + [0.0] * (shape[2] * Ymin)
+                dias[-1] = [0.0] * (shape[2] * shape[1]) * Zmin + dias[-1] * \
+                           (shape[0] - 2 * Zmin) + [0.0] * \
+                           (shape[2] * shape[1]) * Zmin
                 if pos != 0:
                     dias[-1] = dias[-1][-pos:] + dias[-1][:-pos]
                 poss.append(pos)
-    return sc.sparse.dia_matrix((dias, poss), (size, size), dtype = 'float')
+    return sc.sparse.dia_matrix((dias, poss), (size, size), dtype='float')
 
 
-def linearDerivativeOP(shape):
+def linear_derivative_op(shape):
     stencils = stencils_dict[len(shape)]
     shape = shape if len(shape) == 3 else (1,) + shape
-    dx, dxx = linearXDerivativeOP(*shape)
-    dy, dyy = linearYDerivativeOP(*shape)
-    dz, dzz = linearZDerivativeOP(*shape)
-    return [dx + dy + dz, dxx + dyy + dzz + 2 * (dx * dz + dx * dy +  dy * dz)]
-    #return [linearXDerivative(X,
-    #return [linearFilter3(stencil, shape) for stencil in stencils]
-
+    dx, dxx = linear_x_derivative_op(*shape)
+    dy, dyy = linear_y_derivative_op(*shape)
+    dz, dzz = linear_z_derivative_op(*shape)
+    return [dx + dy + dz, dxx + dyy + dzz + 2 * (dx * dz + dx * dy + dy * dz)]
 
 
 class CGObj(object):
@@ -308,8 +316,8 @@ class CGInversion(object):
             yield m, 0
             return
 
-        for i in xrange(maxiter / batch):
-            for j in xrange(batch):
+        for i in range(maxiter / batch):
+            for j in range(batch):
                 # This line calculate the first half of the hessian
                 ridot = np.dot(ri, ri)
 
@@ -319,14 +327,12 @@ class CGInversion(object):
 
                 ri = ri - ai * Ap
 
-
                 # Stopping criterion
                 jnorms.append(np.sum(np.abs(ri)))
-                #jnorm2 = np.dot(r_i1, r_i1)
 
                 bi = np.dot(ri, ri) / ridot
                 pi = ri + bi * pi
 
             yield m
             if jnorms[-1] < gtol:
-                    return
+                return

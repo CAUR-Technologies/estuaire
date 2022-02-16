@@ -1,4 +1,6 @@
-import time, sys
+import time
+import sys
+
 
 class ProgressBar(object):
     """

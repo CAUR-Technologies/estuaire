@@ -648,7 +648,7 @@ static __Pyx_TypeInfo __Pyx_TypeInfo_int = { "int", NULL, sizeof(int), 'I' };
 int __pyx_module_is_main_eikonal__solver = 0;
 
 /* Implementation of eikonal.solver */
-static PyObject *__pyx_builtin_xrange;
+static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_AttributeError;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_range;
@@ -709,7 +709,7 @@ static char __pyx_k__I_FMM2[] = "I_FMM2";
 static char __pyx_k__I_FMM3[] = "I_FMM3";
 static char __pyx_k__fields[] = "fields";
 static char __pyx_k__format[] = "format";
-static char __pyx_k__xrange[] = "xrange";
+static char __pyx_k__range[] = "range";
 static char __pyx_k____doc__[] = "__doc__";
 static char __pyx_k__arrival[] = "arrival";
 static char __pyx_k__spacing[] = "spacing";
@@ -781,7 +781,7 @@ static PyObject *__pyx_n_s__tag;
 static PyObject *__pyx_n_s__time;
 static PyObject *__pyx_n_s__type_num;
 static PyObject *__pyx_n_s__viscosity;
-static PyObject *__pyx_n_s__xrange;
+static PyObject *__pyx_n_s__range;
 static PyObject *__pyx_int_15;
 
 /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/solver.pyx":33
@@ -2007,7 +2007,7 @@ static PyObject *__pyx_pf_7eikonal_6solver_SFMM(PyObject *__pyx_self, PyObject *
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/solver.pyx":165
  *     """
  * 
- *     for i in xrange(arrival.ndim):             # <<<<<<<<<<<<<<
+ *     for i in range(arrival.ndim):             # <<<<<<<<<<<<<<
  *         if (tag.shape[i] != viscosity.shape[i]) or (tag.shape[i] != arrival.shape[i]):
  *             raise AttributeError("Array shape Mismatch")
  */
@@ -2017,7 +2017,7 @@ static PyObject *__pyx_pf_7eikonal_6solver_SFMM(PyObject *__pyx_self, PyObject *
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/solver.pyx":166
  * 
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if (tag.shape[i] != viscosity.shape[i]) or (tag.shape[i] != arrival.shape[i]):             # <<<<<<<<<<<<<<
  *             raise AttributeError("Array shape Mismatch")
  *     if seeds.shape[1] != arrival.ndim:
@@ -2032,7 +2032,7 @@ static PyObject *__pyx_pf_7eikonal_6solver_SFMM(PyObject *__pyx_self, PyObject *
     if (__pyx_t_5) {
 
       /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/solver.pyx":167
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if (tag.shape[i] != viscosity.shape[i]) or (tag.shape[i] != arrival.shape[i]):
  *             raise AttributeError("Array shape Mismatch")             # <<<<<<<<<<<<<<
  *     if seeds.shape[1] != arrival.ndim:
@@ -2320,7 +2320,7 @@ static PyObject *__pyx_pf_7eikonal_6solver_I_FMM(PyObject *__pyx_self, PyObject 
   /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/solver.pyx":184
  *     """
  * 
- *     for i in xrange(arrival.ndim):             # <<<<<<<<<<<<<<
+ *     for i in range(arrival.ndim):             # <<<<<<<<<<<<<<
  *         if (tag.shape[i] != viscosity.shape[i]) or (tag.shape[i] != arrival.shape[i]):
  *             raise AttributeError("Array shape Mismatch")
  */
@@ -2330,7 +2330,7 @@ static PyObject *__pyx_pf_7eikonal_6solver_I_FMM(PyObject *__pyx_self, PyObject 
 
     /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/solver.pyx":185
  * 
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if (tag.shape[i] != viscosity.shape[i]) or (tag.shape[i] != arrival.shape[i]):             # <<<<<<<<<<<<<<
  *             raise AttributeError("Array shape Mismatch")
  *     if viscosity.ndim == 2:
@@ -2345,7 +2345,7 @@ static PyObject *__pyx_pf_7eikonal_6solver_I_FMM(PyObject *__pyx_self, PyObject 
     if (__pyx_t_5) {
 
       /* "/home/jpmercier/AGSIS/Software/src/eikonal-ng/build/solver.pyx":186
- *     for i in xrange(arrival.ndim):
+ *     for i in range(arrival.ndim):
  *         if (tag.shape[i] != viscosity.shape[i]) or (tag.shape[i] != arrival.shape[i]):
  *             raise AttributeError("Array shape Mismatch")             # <<<<<<<<<<<<<<
  *     if viscosity.ndim == 2:
@@ -4475,14 +4475,14 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s__time, __pyx_k__time, sizeof(__pyx_k__time), 0, 0, 1, 1},
   {&__pyx_n_s__type_num, __pyx_k__type_num, sizeof(__pyx_k__type_num), 0, 0, 1, 1},
   {&__pyx_n_s__viscosity, __pyx_k__viscosity, sizeof(__pyx_k__viscosity), 0, 0, 1, 1},
-  {&__pyx_n_s__xrange, __pyx_k__xrange, sizeof(__pyx_k__xrange), 0, 0, 1, 1},
+  {&__pyx_n_s__range, __pyx_k__range, sizeof(__pyx_k__range), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
   #if PY_MAJOR_VERSION >= 3
-  __pyx_builtin_xrange = __Pyx_GetName(__pyx_b, __pyx_n_s__range); if (!__pyx_builtin_xrange) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetName(__pyx_b, __pyx_n_s__range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   #else
-  __pyx_builtin_xrange = __Pyx_GetName(__pyx_b, __pyx_n_s__xrange); if (!__pyx_builtin_xrange) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetName(__pyx_b, __pyx_n_s__range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   #endif
   __pyx_builtin_AttributeError = __Pyx_GetName(__pyx_b, __pyx_n_s__AttributeError); if (!__pyx_builtin_AttributeError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 167; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_ValueError = __Pyx_GetName(__pyx_b, __pyx_n_s__ValueError); if (!__pyx_builtin_ValueError) {__pyx_filename = __pyx_f[1]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}

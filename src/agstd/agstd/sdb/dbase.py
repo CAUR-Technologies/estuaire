@@ -250,7 +250,7 @@ class SeismicHDF5DB(object):
         evt_trigger_table = self.root.triggers.description.col('event_id')
         pick_table = self.root.triggers.pick.col('trigger_id')
         ptype_table = self.root.triggers.pick.col('pick_type')
-        for evt_id in xrange(self.root.events.nrows):
+        for evt_id in range(self.root.events.nrows):
             trg_ids = range(*np.searchsorted(evt_trigger_table, [evt_id, evt_id + 1]))
             for i, t in enumerate(trg_ids):
                 trg_ids[i] = t, [pid for pid in range(*np.searchsorted(pick_table, [t, t+1])) if ptype_table[pid] in ptypes]

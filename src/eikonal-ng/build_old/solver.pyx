@@ -162,7 +162,7 @@ def SFMM(cnp.ndarray seeds,
     This is a redirection.
     """
 
-    for i in xrange(arrival.ndim):
+    for i in range(arrival.ndim):
         if (tag.shape[i] != viscosity.shape[i]) or (tag.shape[i] != arrival.shape[i]):
             raise AttributeError("Array shape Mismatch")
     if seeds.shape[1] != arrival.ndim:
@@ -181,7 +181,7 @@ def I_FMM(cnp.ndarray tag,
     This is a redirection.
     """
 
-    for i in xrange(arrival.ndim):
+    for i in range(arrival.ndim):
         if (tag.shape[i] != viscosity.shape[i]) or (tag.shape[i] != arrival.shape[i]):
             raise AttributeError("Array shape Mismatch")
     if viscosity.ndim == 2:

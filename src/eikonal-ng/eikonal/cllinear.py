@@ -8,9 +8,8 @@
 __doc__ = """
 """
 
-import cycl
-import cycl.clmath as clmath
-
+# import cycl.clmath as clmath
+import numpy as np
 
 """
 
@@ -39,35 +38,37 @@ __kernel_cqiter(__global    float   *A_data
 }
 """
 
-class GPUCGInversion(object):
-    def __init__(self, ctx, A, residual, prior):
-        self.GPU_prior  = ctx.createBufferLike(prior)
-        self.A          = clmath.CLCSRMatrix(ctx, A)
-        self.AT         = clmath.CLCSRMatrix(ctx, (A.tocsc().T))
 
-        self.tmp        = ctx.createBufferLike(q)
-        self.GPU_ri     = ctx.createBufferLike(q)
-        self.m          = clmath.LinkedArray(np.zeros(q.shape, dtype ='float32'))
-
-        self.A          = A
-        self.q          = -(residual * A)
-
-
-    def batch(self, batchsize = 200):
-        """
-        Returns a batch command
-        """
-        Ap = axpy(multiply(tmp, q, pi)
-
-    def send(self):
-        """
-        Returns a send command
-        """
-        return self.GPU_A.send() + self.GPU_AT.send()
+# class GPUCGInversion(object):
+#     def __init__(self, ctx, A, residual, prior):
+#         self.GPU_prior  = ctx.createBufferLike(prior)
+#         self.A          = clmath.CLCSRMatrix(ctx, A)
+#         self.AT         = clmath.CLCSRMatrix(ctx, (A.tocsc().T))
+#
+#         self.tmp        = ctx.createBufferLike(q)
+#         self.GPU_ri     = ctx.createBufferLike(q)
+#         self.m          = clmath.LinkedArray(np.zeros(q.shape, dtype ='float32'))
+#
+#         self.A          = A
+#         self.q          = -(residual * A)
+#
+#
+#     def batch(self, batchsize = 200):
+#         """
+#         Returns a batch command
+#         """
+#         Ap = axpy(multiply(tmp, q, pi))
+#
+#     def send(self):
+#         """
+#         Returns a send command
+#         """
+#         return self.GPU_A.send() + self.GPU_AT.send()
 
 
 class CGInversion(object):
-    def __call__(self, m, A, residual, m0, dT, prior, maxiter = None, gtol = 1e-9, batch = 10):
+    def __call__(self, m, A, residual, m0, dT, prior, maxiter = None,
+                 gtol = 1e-9, batch = 10):
         self.jnorms = jnorms = []
         q = m0 * dT - (residual * A)
 
@@ -82,8 +83,8 @@ class CGInversion(object):
             yield m, 0
             return
 
-        for i in xrange(maxiter / batch):
-            for j in xrange(batch):
+        for i in range(maxiter / batch):
+            for j in range(batch):
                 # This line calculate the first half of the hessian
                 Ap = sT * pi + AT * (A * pi)
                 ai = np.dot(ri, ri) / np.dot(pi, Ap)

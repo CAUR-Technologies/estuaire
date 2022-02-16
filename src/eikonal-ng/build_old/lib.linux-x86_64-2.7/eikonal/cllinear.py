@@ -82,8 +82,8 @@ class CGInversion(object):
             yield m, 0
             return
 
-        for i in xrange(maxiter / batch):
-            for j in xrange(batch):
+        for i in range(maxiter / batch):
+            for j in range(batch):
                 # This line calculate the first half of the hessian
                 Ap = sT * pi + AT * (A * pi)
                 ai = np.dot(ri, ri) / np.dot(pi, Ap)

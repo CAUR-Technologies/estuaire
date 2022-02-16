@@ -72,7 +72,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
                 "event_time" : None, "event_position" : None,
                 "description" : description}
 
-    for i in xrange(len(current_events)):
+    for i in range(len(current_events)):
         finish = tuple(arrival.transform_to(current_events[i]['position'][:len(arrival.shape)]))
         rtt, ind, sens = raytrace.sensivity(agrid, vgrid, start, finish,
                                             indices_buffer,
@@ -88,7 +88,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
 
 
         # Calculation of the Frechet Derivative for the Event position
-        for j in xrange(len(finish)):
+        for j in range(len(finish)):
             delta = 0.1
             new_finish = list(finish)
             new_finish[j] += delta
