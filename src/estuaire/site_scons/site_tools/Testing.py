@@ -14,6 +14,7 @@ from SCons.Script import Builder
 
 import cPickle as pickle
 import numpy as np
+from agstd.tools import np_load
 
 def PerturbateColumnAction(source, target, env):
     """
@@ -25,7 +26,7 @@ def PerturbateColumnAction(source, target, env):
     colname, stdev = [s.value for s in source[1:3]]
 
     outfile = str(target[0])
-    inobj = np.load(infile)
+    inobj = np_load(infile)
 
     intable = inobj[source[3].value] if len(source) > 3 else inobj
 

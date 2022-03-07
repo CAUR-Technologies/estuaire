@@ -13,6 +13,8 @@ try:
 except ImportError, e:
     import simplejson as json
 
+from agstd.tools import np_load
+
 import SCons
 from SCons.Script import Builder, Action
 
@@ -106,7 +108,7 @@ def CreateBlkMatrixAction(source, target, env):
             row[i] = sc.sparse.eye(size, size, dtype = 'float') * s.value
             sparse.append(row)
         else:
-            cblk = np.load(str(s))
+            cblk = np_load(str(s))
             if cblk is not None:
                 row[i] = cblk
                 sparse.append(row)
@@ -132,10 +134,10 @@ def CreateBlkVectorAction(source, target, env):
 
             blk[i] = np.diag([s.value] * size)
         else:
-            b = np.load(str(s))
+            b = np_load(str(s))
             if b.size != size:
                 raise AttributeError("Invalid Vector Size Detected : %s [%d vs %d]" % (name, b.size, size))
-            blk[i] = np.ravel(np.load(str(s)))
+            blk[i] = np.ravel(np_load(str(s)))
     vect = np.concatenate(blk)
 
     pickle.dump(vect, open(str(target[0]), 'wb'),

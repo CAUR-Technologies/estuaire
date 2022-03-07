@@ -23,6 +23,7 @@ import eikonal.data
 import sys
 
 import logging
+from agstd.tools import np_load
 log = logging.getLogger("Eikonal Solver")
 
 def parse_seeds(seeds):
@@ -42,11 +43,11 @@ def seeded_esolve(velocity, seeds, spacing, second_order = True):
     shape = velocity.shape
 
     viscosity = np.zeros(np.array(shape) + 4, dtype = 'float64')
-    viscosity.__setitem__([slice(2,-2)] * len(shape), 1.0 / velocity)
+    viscosity.__setitem__(tuple([slice(2,-2)] * len(shape)), 1.0 / velocity)
 
     tag = np.zeros(viscosity.shape, dtype = 'int32')
     tag.fill(2)
-    tag.__setitem__([slice(2, -2)] * len(shape), 0)
+    tag.__setitem__(tuple([slice(2, -2)] * len(shape)), 0)
 
     arrival = np.empty_like(viscosity)
     arrival.fill(np.inf)
@@ -54,7 +55,7 @@ def seeded_esolve(velocity, seeds, spacing, second_order = True):
     esolver.SFMM(seeds + 2, np.zeros(len(seeds)), tag, viscosity, arrival, spacing,
                  second_order = second_order)
 
-    return arrival.__getitem__([slice(2,-2)] * len(shape))
+    return arrival.__getitem__(tuple([slice(2,-2)] * len(shape)))
 
 
 def tagged_esolve(tag, velocity, arrival, spacing, second_order = True):
@@ -62,19 +63,19 @@ def tagged_esolve(tag, velocity, arrival, spacing, second_order = True):
     """
     shape = velocity.shape
     viscosity = np.zeros(np.array(shape) + 4, dtype = 'float64')
-    viscosity.__setitem__([slice(2,-2)] * velocity.ndim, 1.0 / velocity)
+    viscosity.__setitem__(tuple([slice(2,-2)] * velocity.ndim), 1.0 / velocity)
 
     os_tag = np.zeros(viscosity.shape, dtype = 'int32')
     os_tag.fill(2)
-    os_tag.__setitem__([slice(2, -2)] * tag.ndim, tag)
+    os_tag.__setitem__(tuple([slice(2, -2)] * tag.ndim), tag)
 
     os_arrival = np.empty_like(viscosity)
     os_arrival.fill(np.inf)
-    os_arrival.__setitem__([slice(2, -2)] * arrival.ndim, arrival)
+    os_arrival.__setitem__(tuple([slice(2, -2)] * arrival.ndim), arrival)
 
     esolver.I_FMM(os_tag, viscosity, os_arrival, spacing, second_order = second_order)
 
-    return os_arrival.__getitem__([slice(2,-2)] * arrival.ndim)
+    return os_arrival.__getitem__(tuple([slice(2,-2)] * arrival.ndim))
 
 
 def check_boundary(value, shape):
@@ -166,4 +167,4 @@ def esolve(velocity, seeds, subgrid_spacing = 10, second_order = True, spacing =
 
 
 if __name__ == "__main__":
-    main.main(esolve, spacing = float, seeds = parse_seeds, velocity = np.load, subgrid_spacing = int)
+    main.main(esolve, spacing = float, seeds = parse_seeds, velocity = np_load, subgrid_spacing = int)

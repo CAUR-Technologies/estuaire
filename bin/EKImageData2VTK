@@ -30,6 +30,6 @@ def convert2VTK(idata, vtype, outfile):
                cellData = {vel_key: Vel.data})
 
 if __name__ == "__main__":
-    main.main(convert2VTK, idata=np.load, vtype=str, outfile=str)
+    main.main(convert2VTK, idata=np_load, vtype=str, outfile=str)
 
 

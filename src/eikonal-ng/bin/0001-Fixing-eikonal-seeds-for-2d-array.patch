@@ -25,7 +25,7 @@ index 0ae98c2..ea7c82f 100644
      velocityfile = str(source[0])
 +    vgrid = pickle.load(open(velocityfile, 'rb'))
  
-     tttable = np.load(str(source[1]))
+     tttable = np_load(str(source[1]))
      seed = tttable.station_row['position']
  
 -    strseed = [str(s) for s in seed]

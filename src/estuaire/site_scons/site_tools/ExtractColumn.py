@@ -17,6 +17,7 @@ import logger
 
 import logging
 log = logging.getLogger('tools.ExtractColumn')
+from agstd.tools import np_load
 
 def ExtractColumn(source, target, env):
     """
@@ -31,7 +32,7 @@ def ExtractColumn(source, target, env):
 
     outfile = str(target[0])
 
-    column = np.load(tfile).data[colname]
+    column = np_load(tfile).data[colname]
     if log.isEnabledFor(logging.INFO):
         log.info("Extracted %s Info <range=[%f, %f], average=%f, stdev=%f" % \
                  (colname, column.max(), column.min(), np.average(column), np.std(column)))
@@ -44,7 +45,7 @@ def ExtractData(source, target, env):
     :target 1:  Output
     """
     gfile = str(source[0])
-    grid = np.load(gfile)
+    grid = np_load(gfile)
 
     outfile = str(target[0])
     pickle.dump(grid.data, open(outfile, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)

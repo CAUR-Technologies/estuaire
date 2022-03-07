@@ -1,4 +1,5 @@
 import eikonal.data as edata
+from agstd.tools import np_load
 
 evdtype = [('id', 'S100'), ('pos', 'float', 3), ('delta_t', 'float')]
 stdtype = evdtype

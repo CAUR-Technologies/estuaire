@@ -11,6 +11,7 @@
 import numpy as np
 
 import agstd.text
+from agstd.tools import np_load
 
 grid_dtype = [("X", "int"),
               ("Y", "int"),
@@ -38,4 +39,4 @@ def export_txt_grid(grid, output):
 
 if __name__ == '__main__':
     import agstd.main
-    agstd.main.main(export_txt_grid, grid = np.load)
+    agstd.main.main(export_txt_grid, grid = np_load)

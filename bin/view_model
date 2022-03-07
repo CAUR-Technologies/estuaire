@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import numpy as np
 import enthought.mayavi.mlab as mlab
+from agstd.tools import np_load
 
 import sys
 
-im = np.load(sys.argv[1])
+im = np_load(sys.argv[1])
 
 mlab.contour3d(im.data)

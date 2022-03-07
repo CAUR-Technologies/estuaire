@@ -12,6 +12,7 @@ This script compute the rays from a list of event to a particular station.
 """
 
 import agstd.main as main
+from agstd.tools import np_load
 
 import cPickle as pickle
 import numpy as np
@@ -40,7 +41,7 @@ def buildray(arrival, velocity, events, h = 1):
     :param h: The step of the RK integration Scheme.
     """
 
-    current_events = np.load(events)
+    current_events = np_load(events)
     h = 1 if h is None else float(h)
 
     if not (velocity.check_compatibility(arrival)):
@@ -71,5 +72,5 @@ def buildray(arrival, velocity, events, h = 1):
     return dict(rays=rays)
 
 if __name__ == "__main__":
-    main.main(buildray, spacing=float, arrival=np.load,
-              velocity=np.load, traveltime=np.load)
+    main.main(buildray, spacing=float, arrival=np_load,
+              velocity=np_load, traveltime=np_load)

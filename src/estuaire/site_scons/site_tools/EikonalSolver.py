@@ -14,6 +14,7 @@ import os
 import subprocess
 import numpy as np
 import cPickle as pickle
+from agstd.tools import np_load
 
 import logger
 import escripts
@@ -29,7 +30,7 @@ def EikonalSolver2(source, target, env):
     velocityfile = str(source[0])
     vgrid = pickle.load(open(velocityfile, 'rb'))
 
-    tttable = np.load(str(source[1]))
+    tttable = np_load(str(source[1]))
     seed = tttable.station_row['position']
 
     strseed = [str(s) for sh, s in zip(vgrid.shape, seed)]

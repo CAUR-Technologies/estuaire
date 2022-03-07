@@ -20,6 +20,7 @@ import scipy.sparse
 import os
 
 import eikonal.raytrace as raytrace
+from agstd.tools import np_load
 
 import sys
 
@@ -73,5 +74,5 @@ def buildray(arrival, velocity, traveltime, h = 1):
 
 
 if __name__ == "__main__":
-    main.main(buildray, spacing = float, arrival = np.load,
-              velocity = np.load, traveltime = np.load)
+    main.main(buildray, spacing = float, arrival = np_load,
+              velocity = np_load, traveltime = np_load)

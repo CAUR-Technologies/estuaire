@@ -16,6 +16,7 @@ import cPickle as pickle
 import numpy as np
 
 import agstd.sdb.sqldbase as dbase
+from agstd.tools import np_load
 
 def SQLPushDB(target, source, env):
     """
@@ -33,8 +34,8 @@ def SQLPushDB(target, source, env):
     evfile, stfile = [str(s) for s in source[:2]]
     ttfiles = [str(s) for s in source[2:]]
 
-    evtable = np.load(open(evfile))
-    sttable = np.load(open(evfile))
+    evtable = np_load(open(evfile))
+    sttable = np_load(open(evfile))
 
     for i, e in enumerate(evtable):
         conn.execute("INSERT INTO event(id, X, Y, Z) VALUES(?,?,?,?)",
@@ -46,7 +47,7 @@ def SQLPushDB(target, source, env):
 
     i = 0
     for ttfile in ttfiles:
-        tttable = np.load(open(ttfile))
+        tttable = np_load(open(ttfile))
         sid = tttable['station_id']
         for tt in tttable['ary']:
             conn.execute("INSERT INTO" \

@@ -14,7 +14,7 @@
 
 
 #for rayfile in sys.argv[1:]:
-    #rays = np.load(rayfile)
+    #rays = np_load(rayfile)
     #src = msource.VTKDataSource(data = ray.ray_source(rays['rays']))
     #engine.add_source(src)
     #mod = mmodule.Surface()
@@ -37,6 +37,7 @@ from enthought.mayavi.core.api import Engine
 import enthought.mayavi.mlab as mlab
 
 import numpy as np
+from agstd.tools import np_load
 
 def extremum(ary):
     return np.min(ary), np.max(ary)
@@ -111,4 +112,4 @@ def boundary_selection(events, stations):
 
 if __name__ == '__main__':
     import agstd.main as main
-    main.main(boundary_selection, events = np.load, stations = np.load)
+    main.main(boundary_selection, events = np_load, stations = np.load)

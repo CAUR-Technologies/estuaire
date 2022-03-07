@@ -3,6 +3,7 @@
 import numpy as np
 import argparse
 import pandas as pd
+from agstd.tools import np_load
 
 if __name__ == '__main__':
 
@@ -14,7 +15,7 @@ if __name__ == '__main__':
 	fin = args.fin
 	fout = args.fout
 
-	vmodel = np.load(fin)
+	vmodel = np_load(fin)
 
 	(nx, ny, nz) = vmodel.shape
 	(ox, oy, oz) = vmodel.origin

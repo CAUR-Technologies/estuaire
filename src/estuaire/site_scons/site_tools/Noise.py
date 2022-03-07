@@ -4,9 +4,10 @@ import numpy as np
 import cPickle as pickle
 
 import logger
+from agstd.tools import np_load
 
 def AdditiveGaussianNoise(target, source, env):
-    tableobj = np.load(str(source[0]))
+    tableobj = np_load(str(source[0]))
     columns, stdev = [s.value for s in source[1:3]]
 
     for c, s in zip(columns, stdev):

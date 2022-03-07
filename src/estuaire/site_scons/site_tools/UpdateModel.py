@@ -11,6 +11,7 @@ __doc__ = """
 from SCons.Script import Builder, Action
 import cPickle as pickle
 import numpy as np
+from agstd.tools import np_load
 
 import logger
 
@@ -42,8 +43,8 @@ def UpdateTableAction(source, target, env):
     desc_file       = str(source[-1])
 
     description = pickle.load(open(desc_file))
-    model = np.load(model_file)
-    table = np.load(orig_file)
+    model = np_load(model_file)
+    table = np_load(orig_file)
 
     new_values = extract_column(model_colname, description, model)
 
@@ -69,9 +70,9 @@ def UpdateGridAction(source, target, env):
     outfile     = str(target[0])
 
     description = pickle.load(open(desc_file))
-    model = np.load(model_file)
+    model = np_load(model_file)
 
-    gdesc = np.load(orig_file)
+    gdesc = np_load(orig_file)
     gdesc.data = extract_column(colname, description, model)
 
     pickle.dump(gdesc, open(outfile, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
@@ -83,7 +84,7 @@ def SaveGridAction(source, target, env):
     outfile     = str(target[0])
 
     description = pickle.load(open(desc_file))
-    model = np.load(model_file)
+    model = np_load(model_file)
 
     grid = extract_column(colname, description, model)
 

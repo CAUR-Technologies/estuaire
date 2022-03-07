@@ -15,6 +15,7 @@ __doc__ = """
 
 
 from SCons.Script import Builder, Execute, Mkdir
+from agstd.tools import np_load
 
 
 def generate(env):
@@ -40,11 +41,11 @@ def generate(env):
         spacing = source[4]
         ttfiles = [str(s) for s in source[5:]]
 
-        stations = np.load(stfile)
+        stations = np_load(stfile)
 
         atargets = []
         for tt in ttfiles:
-            stdesc = stations[np.load(tt)['station_id']]
+            stdesc = stations[np_load(tt)['station_id']]
             efile = os.path.join(edir, "arrival_" + os.path.basename(str(tt)))
             ffile = os.path.join(fdir, "frechet_" + os.path.basename(str(tt)))
 

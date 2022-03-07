@@ -17,6 +17,7 @@ import scipy.sparse
 import os
 
 import eikonal.raytrace as raytrace
+from agstd.tools import np_load
 
 import sys
 
@@ -166,4 +167,4 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
 
 
 if __name__ == "__main__":
-    main.main(sensivity, traveltime = np.load, arrival = np.load, velocity = np.load)
+    main.main(sensivity, traveltime = np_load, arrival = np_load, velocity = np_load)

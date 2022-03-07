@@ -14,6 +14,7 @@ import numpy as np
 import cPickle as pickle
 
 import eikonal.data
+from agstd.tools import np_load
 
 import logger
 
@@ -47,7 +48,7 @@ def HomogenousGridFromGridDescription(source, target, env):
 def HomogenousGridLike(source, target, env):
     """
     """
-    grid = np.load(str(source[0]))
+    grid = np_load(str(source[0]))
     fill_value = source[1].value
     outfile = str(target[0])
 

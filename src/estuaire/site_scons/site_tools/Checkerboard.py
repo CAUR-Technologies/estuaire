@@ -13,6 +13,7 @@ import escripts
 import subprocess
 
 import numpy as np
+from agstd.tools import np_load
 
 def CheckerboardAction(target, source, env):
     """
@@ -49,7 +50,7 @@ def CheckerboardLikeAction(target, source, env):
                     3 - Variation in Percentage of BG Velocity (optional)
     """
 
-    grid = np.load(str(source[0]))
+    grid = np_load(str(source[0]))
     sigma, bgvel = [s.value for s in source[1:3]]
     output = str(target[0])
 

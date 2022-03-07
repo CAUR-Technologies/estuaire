@@ -16,6 +16,7 @@ import numpy as np
 import scipy as sc
 import scipy.ndimage
 import cPickle as pickle
+from agstd.tools import np_load
 
 def GaussianSmoothingAction(source, target, env):
     """
@@ -29,7 +30,7 @@ def GaussianSmoothingAction(source, target, env):
     sigma = source[1].value
     outfile = str(target[0])
 
-    grid = np.load(infile)
+    grid = np_load(infile)
 
     grid.data = scipy.ndimage.gaussian_filter(grid.data, sigma / grid.spacing, mode = 'mirror')
 

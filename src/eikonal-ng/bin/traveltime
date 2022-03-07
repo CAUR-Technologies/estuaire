@@ -15,6 +15,7 @@ import numpy as np
 import scipy as sc
 import scipy.sparse
 import os
+from agstd.tools import np_load
 
 import eikonal.raytrace as raytrace
 import eikonal.solver as esolver
@@ -31,10 +32,10 @@ def traveltime(velocity, station, event, eventlst, spacing, h):
         h = 1
     h = float(h)
 
-    st, ev = [np.load(s) for s in [velocity, station, event, eventlst]]
+    st, ev = [np_load(s) for s in [velocity, station, event, eventlst]]
 
 
-    vgrid = np.load(velocity)
+    vgrid = np_load(velocity)
 
     esolver.SFMM
 

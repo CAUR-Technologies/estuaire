@@ -22,6 +22,7 @@ import eikonal.raytrace as raytrace
 import numpy as np
 import scipy as sc
 import scipy.sparse
+from agstd.tools import np_load
 
 import os
 import sys
@@ -78,6 +79,6 @@ def cross_sensivity_main(velocity, standard_velocity, raypath, grid_id):
 
 
 if __name__ == "__main__":
-    main.main(cross_sensivity_main, raypath = np.load,
-              standard_velocity = np.load, velocity = np.load)
+    main.main(cross_sensivity_main, raypath = np_load,
+              standard_velocity = np_load, velocity = np_load)
 
