@@ -49,18 +49,18 @@ def main_txt(input_event, input_station, output_event = None, output_station = N
     evdata = txtsttable(input_event)
     event_table = edata.EKEventTable(evdata.getTable())
     if None != output_event:
-        pickle.dump(event_table, open(output_event, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+        pickle.dump(event_table, open(output_event, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
     stdata = txtsttable(input_station)
     station_table = edata.EKStationTable(stdata.getTable())
     if (None != input_station) and (None != output_station):
-        pickle.dump(station_table, open(output_station, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+        pickle.dump(station_table, open(output_station, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
     if (None != input_tt) and (None != output_tt_template):
         ttdata = txttttable(input_tt)
         for tt_table in ttdata.splitUnique(evdata.index, stdata.index, evnfile = os.path.abspath(output_event), stafile = os.path.abspath(output_station)):
             filename = output_tt_template % tt_table.station_id
-            pickle.dump(tt_table, open(filename, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+            pickle.dump(tt_table, open(filename, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
 
 
@@ -93,15 +93,15 @@ def read_in_one_file(input, output_event = None, output_station = None, output_t
     st_ary = edata.EKStationTable(np.array(st_table, dtype = edata.st_dtype))
 
     if output_event != None:
-        pickle.dump(ev_ary, open(output_event, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+        pickle.dump(ev_ary, open(output_event, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
     if output_station != None:
-        pickle.dump(st_ary, open(output_station, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+        pickle.dump(st_ary, open(output_station, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
     if output_tt_template != None:
         for k, v in tt_table.iteritems():
             filename = output_tt_template % stdict[k]
             tt_ary = edata.EKTTTable(np.array(v, dtype = edata.tt_dtype), stdict[k], evnfile = output_event, stafile = output_station)
-            pickle.dump(tt_ary, open(filename, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+            pickle.dump(tt_ary, open(filename, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
 
 

@@ -31,7 +31,7 @@ def EuclidianTransform(source, target, env):
     obj.position = (obj.position - origin) *  scale
     obj.origin += origin
     obj.scale *= scale
-    pickle.dump(obj, open(out, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+    pickle.dump(obj, open(out, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
 def generate(env):
     env['BUILDERS']['TableTransform'] = \

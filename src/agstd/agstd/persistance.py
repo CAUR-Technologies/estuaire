@@ -44,7 +44,7 @@ class DirectoryDB(object):
                 if os.path.isdir(keypath):
                         return DirectoryDB(keypath)
 
-                with open(keypath) as f:
+                with open(keypath, 'rb') as f:
                         value = pickle.load(f)
 
                 try:

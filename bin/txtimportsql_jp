@@ -192,10 +192,10 @@ def read_in_one_file(input, sqloutput, output_event = None, output_station = Non
 
     print "Results"
     if output_event != None:
-        pickle.dump(ev_ary, open(output_event, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+        pickle.dump(ev_ary, open(output_event, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
         print "\tNumber of Events : %i (%d in SQL)" % (ev_ary.size, db.execute("SELECT COUNT(id) FROM event").fetchone()[0])
     if output_station != None:
-        pickle.dump(st_ary, open(output_station, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+        pickle.dump(st_ary, open(output_station, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
         print "\tNumber of Stations : %i (%d in SQL)" % (st_ary.size, db.execute("SELECT COUNT(id) FROM station").fetchone()[0])
 
     mb = dbase.ModelQueryBuilder()
@@ -214,7 +214,7 @@ def read_in_one_file(input, sqloutput, output_event = None, output_station = Non
             print "\t\tStation ID %i - %i recording (S + P) (%i in SQL)" % (stdict[k] + 1, ttary.size, sqllen)
             filename = output_tt_template % stdict[k]
             tt_ary = edata.EKTTTable(ttary, stdict[k], evnfile = output_event, stafile = output_station)
-            pickle.dump(tt_ary, open(filename, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+            pickle.dump(tt_ary, open(filename, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
     print "Discrepencies"
     for k, n in discrepencies.iteritems():

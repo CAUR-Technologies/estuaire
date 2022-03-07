@@ -27,7 +27,7 @@ def dd(input_file):
     """
     :param input_file: The Station-wise frechet derivative
     """
-    A = pickle.load(open(input_file))
+    A = pickle.load(open(input_file, 'rb'))
     if A[A['description'].keys()[0]] is None:
         return A
 

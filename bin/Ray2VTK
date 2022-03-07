@@ -40,7 +40,7 @@ points = []
 lines = tvtk.CellArray()
 pid = 0
 for rayfile in glob(rayfiles):
-    data = pickle.load(open(rayfile))
+    data = pickle.load(open(rayfile, 'rb'))
     for i in range(len(data['rays'])):
         if i%decimate == 0:
             line = []#len(data['rays'][i])]

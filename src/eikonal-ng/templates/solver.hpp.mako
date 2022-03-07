@@ -76,7 +76,7 @@ inline void quadratic_square(const double a, const double b, agsis::vect<double,
 template<FiniteDifferenceSide DSIDE>
 struct FirstOrderSemiFiniteDifference
 {
-    static const int mult = 1;
+    static constexpr int mult = 1;
     template <typename T, std::size_t D, bool BC>
     inline static double evaluate(const ArrayDescriptor<T, D, BC> &grid,
                                   const std::size_t dim,
@@ -106,7 +106,7 @@ struct FirstOrderSemiFiniteDifference
 template<FiniteDifferenceSide DSIDE>
 struct SecondOrderSemiFiniteDifference
 {
-    static const double mult = 1.5;
+    static constexpr double mult = 1.5;
     template <typename T, std::size_t D, bool BC>
     inline static double evaluate(const ArrayDescriptor<T, D, BC> &grid,
                                   const std::size_t dim,

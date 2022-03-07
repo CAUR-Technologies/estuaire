@@ -18,7 +18,6 @@ import string
 import os
 
 
-
 def Raytracing(env, eikonal_targets,
                traveltime_targets, velocity_grids, root = 'build', h = 1):
     """
@@ -63,14 +62,17 @@ def RegularizationOperator(env, shape, eta = (1, 1), spacing = 1):
 def generate(env):
     import new
 
-    tools = ['BuildInfos', 'ForwardModelling', 'FetchDB', 'ExtractColumn',
-             'TableTransform', 'VelocityGrid', 'CGInverse','FilterDB',
+    tools = ['BuildInfos', 'ForwardModelling', 'ExtractColumn',
+             'TableTransform', 'VelocityGrid', 'CGInverse',
              'GridDifference', 'UpdateModel', 'Report', 'DoubleDifference',
-             'GaussianSmoothing', 'Raytrace', 'SQLFetchDB', 'Checkerboard',
-             'Exporter', 'Noise']
+             'GaussianSmoothing', 'Raytrace', 'Checkerboard',
+             'Exporter', 'Noise', 'FilterDB', 'Stats']
 
     for t in tools:
-        env.Tool(t)
+        try:
+            env.Tool(t)
+        except:
+            print(t)
 
     env.RegularizationOperator = \
             new.instancemethod(RegularizationOperator, env, env.__class__)

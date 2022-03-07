@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sc
 import scipy.sparse
 
-import tables
+# import tables
 
 import  datetime, \
         time, \

@@ -57,7 +57,7 @@ class GPUCGInversion(object):
         """
         Returns a batch command
         """
-        Ap = axpy(multiply(tmp, q, pi)
+        Ap = axpy(multiply(tmp, q, pi))
 
     def send(self):
         """
@@ -67,7 +67,8 @@ class GPUCGInversion(object):
 
 
 class CGInversion(object):
-    def __call__(self, m, A, residual, m0, dT, prior, maxiter = None, gtol = 1e-9, batch = 10):
+    def __call__(self, m, A, residual, m0, dT, prior, maxiter = None,
+                 gtol = 1e-9, batch = 10):
         self.jnorms = jnorms = []
         q = m0 * dT - (residual * A)
 

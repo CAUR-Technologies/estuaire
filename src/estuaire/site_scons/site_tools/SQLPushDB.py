@@ -19,6 +19,11 @@ import agstd.sdb.sqldbase as dbase
 
 def SQLPushDB(target, source, env):
     """
+    :param target:
+    :param source:
+    :param env:
+    :return:
+    """
     
     dbfile = str(target[0])
     conn = sqlite3.connect(dbfile)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import tables
+# import tables
 import numpy as np
 import sys
 import logging

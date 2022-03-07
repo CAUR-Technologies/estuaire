@@ -12,10 +12,17 @@ __doc__ = """
 from SCons.Script import Builder, Action
 
 import numpy as np
-import cPickle as pickle
-import os
+import pickle
 
 import logger
+
+
+def np_load(*args, **kwargs):
+    if 'allow_pickle' in kwargs.keys():
+        return np.load(*args, **kwargs)
+    else:
+        return np.load(*args, allow_pickle=True, **kwargs)
+
 
 def FilterDB(source, target, env):
     """
@@ -27,7 +34,7 @@ def FilterDB(source, target, env):
 
     Target :        0 - Output TT File
     """
-    etable, stable, ttable = [np.load(str(s)) for s in source[:3]]
+    etable, stable, ttable = [np_load(str(s)) for s in source[:3]]
     origin, length = [s.value for s in source[3:5]]
 
     outfile = str(target[0])
@@ -42,7 +49,8 @@ def FilterDB(source, target, env):
 
     ttable['ary'] = ttable['ary'][ein[ttable['ary']['event_id']]]
 
-    pickle.dump(ttable, open(outfile, 'w'))
+    pickle.dump(ttable, open(outfile, 'wb'))
+
 
 def UpdateAndFilterTT(source, target, env):
     """
@@ -54,7 +62,8 @@ def UpdateAndFilterTT(source, target, env):
 
     :target 0:  Output TT FIle
     """
-    tttable, evtable, sttable, grid = [np.load(str(s)) for s in source[:4]]
+    tttable, evtable, sttable, grid = [np_load(str(s)) for s in source[:4]]
+
     padding = source[4].value * grid.spacing
 
     outfile = str(target[0])
@@ -78,7 +87,7 @@ def UpdateAndFilterTT(source, target, env):
     tttable.__evn_file__ = str(source[1])
     tttable.__sta_file__ = str(source[2])
 
-    pickle.dump(tttable, open(outfile, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+    pickle.dump(tttable, open(outfile, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
 
 

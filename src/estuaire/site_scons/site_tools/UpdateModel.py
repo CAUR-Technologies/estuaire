@@ -49,7 +49,7 @@ def UpdateTableAction(source, target, env):
 
     table.data[table_colname] = new_values
 
-    pickle.dump(table, open(str(target[0]), 'w'),
+    pickle.dump(table, open(str(target[0]), 'wb'),
                 protocol = pickle.HIGHEST_PROTOCOL)
 
 
@@ -74,7 +74,7 @@ def UpdateGridAction(source, target, env):
     gdesc = np.load(orig_file)
     gdesc.data = extract_column(colname, description, model)
 
-    pickle.dump(gdesc, open(outfile, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+    pickle.dump(gdesc, open(outfile, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
 def SaveGridAction(source, target, env):
     colname     = source[0].value
@@ -87,7 +87,7 @@ def SaveGridAction(source, target, env):
 
     grid = extract_column(colname, description, model)
 
-    pickle.dump(grid, open(outfile, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+    pickle.dump(grid, open(outfile, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
 
 

@@ -30,7 +30,7 @@ def HomogenousGridAction(source, target, env):
 
     grid = np.empty(shape, dtype = 'float')
     grid.fill(value)
-    pickle.dump( grid, open(gridfile, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+    pickle.dump( grid, open(gridfile, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
 def HomogenousGridFromGridDescription(source, target, env):
     """
@@ -42,7 +42,7 @@ def HomogenousGridFromGridDescription(source, target, env):
     outfile = str(target[0])
 
     grid = grid_description.gen_homogeneous_grid(fill_value)
-    pickle.dump(grid, open(outfile, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+    pickle.dump(grid, open(outfile, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
 def HomogenousGridLike(source, target, env):
     """
@@ -54,7 +54,7 @@ def HomogenousGridLike(source, target, env):
     outgrid = eikonal.data.EKImageData(grid.shape, grid.spacing, origin = grid.origin)
     outgrid.data.fill(fill_value)
 
-    pickle.dump(outgrid, open(outfile, 'w'), protocol = pickle.HIGHEST_PROTOCOL)
+    pickle.dump(outgrid, open(outfile, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
 
 
 
