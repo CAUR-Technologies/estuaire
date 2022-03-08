@@ -21,16 +21,19 @@ from agstd.tools import np_load
 
 import sys
 
+from scipy.ndimage import map_coordinates
+
 from itertools import izip
 
 sys.stdout = sys.stderr
-
 
 
 def sensivity(arrival, velocity, traveltime, grid_id, h = None):
     if h is None:
         h = 1
     h = float(h)
+
+    ttgrid = arrival
 
     if (arrival.spacing != velocity.spacing) or (arrival.shape != velocity.shape):
         raise AttributeError("Arrival and Velocity grid incompatible")
@@ -49,8 +52,8 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
         raise ValueError("Station Position is not the seeds of the given arrival grid")
 
     max_len = np.sqrt(np.sum(np.array(vgrid.shape) ** 2)) * (4 ** len(vgrid.shape))
-    indices_buffer = np.zeros(max_len * (8.0 / h),  dtype='uintp')
-    sensivity_buffer = np.zeros(max_len * (8.0 / h), dtype='float')
+    indices_buffer = np.zeros(int(max_len * (8.0 / h)),  dtype='uintp')
+    sensivity_buffer = np.zeros(int(max_len * (8.0 / h)), dtype='float')
 
     Gindices_X = []
     Gindices_Y = []
@@ -89,9 +92,12 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
 
 
         # Calculation of the Frechet Derivative for the Event position
+        end = finish[-1]
+        shape = arrival.shape
         for j in xrange(len(finish)):
             delta = 0.1
             new_finish = list(finish)
+            end = new_finish
             new_finish[j] += delta
             new_finish1 = tuple(new_finish)
             new_finish[j] -= 2 * delta
@@ -100,7 +106,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
             new_end1 = np.array(new_finish1)
             new_end2 = np.array(new_finish2)
 
-            if new_end[j] > shape[j]:
+            if new_end1[j] > shape[j]:
                 new_end1 = end
 
             if new_end2[j] < shape[j]:
