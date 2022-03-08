@@ -17,23 +17,20 @@ import scipy.sparse
 import os
 
 import eikonal.raytrace as raytrace
-from agstd.tools import np_load
 
 import sys
 
-from scipy.ndimage import map_coordinates
-
 from itertools import izip
+from agstd.tools import np_load
 
 sys.stdout = sys.stderr
+
 
 
 def sensivity(arrival, velocity, traveltime, grid_id, h = None):
     if h is None:
         h = 1
     h = float(h)
-
-    ttgrid = arrival
 
     if (arrival.spacing != velocity.spacing) or (arrival.shape != velocity.shape):
         raise AttributeError("Arrival and Velocity grid incompatible")
@@ -44,6 +41,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
 
     agrid = arrival.data
 
+
     vgrid = velocity.data
 
     stpos = stdesc['position'][:len(arrival.shape)]
@@ -52,8 +50,8 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
         raise ValueError("Station Position is not the seeds of the given arrival grid")
 
     max_len = np.sqrt(np.sum(np.array(vgrid.shape) ** 2)) * (4 ** len(vgrid.shape))
-    indices_buffer = np.zeros(int(max_len * (8.0 / h)),  dtype='uintp')
-    sensivity_buffer = np.zeros(int(max_len * (8.0 / h)), dtype='float')
+    indices_buffer = np.zeros(int(max_len * (8.0 / h)),  dtype = 'uintp')
+    sensivity_buffer = np.zeros(int(max_len * (8.0 / h)), dtype = 'float')
 
     Gindices_X = []
     Gindices_Y = []
@@ -92,38 +90,24 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
 
 
         # Calculation of the Frechet Derivative for the Event position
-        end = finish[-1]
-        shape = arrival.shape
         for j in xrange(len(finish)):
             delta = 0.1
             new_finish = list(finish)
-            end = new_finish
             new_finish[j] += delta
             new_finish1 = tuple(new_finish)
             new_finish[j] -= 2 * delta
             new_finish2 = tuple(new_finish)
 
-            new_end1 = np.array(new_finish1)
-            new_end2 = np.array(new_finish2)
 
-            if new_end1[j] > shape[j]:
-                new_end1 = end
+            perturbated_tt1 = raytrace.traveltime(agrid, vgrid,
+                                                 start, new_finish1,
+                                                 velocity.spacing,
+                                                 h = h)
 
-            if new_end2[j] < shape[j]:
-                new_end2 = end
-
-            perturbated_tt1 = map_coordinates(ttgrid, new_end1[:, np.newaxis])
-            perturbated_tt2 = map_coordinates(ttgrid, new_end2[:, np.newaxis])
-
-            # perturbated_tt1 = raytrace.traveltime(agrid, vgrid,
-            #                                      start, new_finish1,
-            #                                      velocity.spacing,
-            #                                      h = h)
-
-            # perturbated_tt2 = raytrace.traveltime(agrid, vgrid,
-            #                                      start, new_finish2,
-            #                                      velocity.spacing,
-            #                                      h = h)
+            perturbated_tt2 = raytrace.traveltime(agrid, vgrid,
+                                                 start, new_finish2,
+                                                 velocity.spacing,
+                                                 h = h)
             EPA_Y.append(i)
             EPA_X.append(tttable.data['event_id'][i] * len(finish) + j)
             EPA_V.append((perturbated_tt1 - perturbated_tt2) / (velocity.spacing * delta))
@@ -173,4 +157,5 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
 
 
 if __name__ == "__main__":
-    main.main(sensivity, traveltime = np_load, arrival = np_load, velocity = np_load)
+    main.main(sensivity, traveltime = np_load, arrival = np_load, 
+    velocity = np_load)

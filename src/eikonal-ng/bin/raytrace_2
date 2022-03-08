@@ -52,7 +52,8 @@ def buildray(arrival, velocity, events, h = 1):
 
     max_len = np.sqrt(np.sum(np.array(velocity.data.shape) ** 2))
 
-    raybuffer = np.empty((max_len * (8.0 / h), len(velocity.data.shape)), dtype='float64')
+    raybuffer = np.empty((int(max_len * (8.0 / h)), len(velocity.data.shape)),
+                         dtype='float64')
 
     rays = []
 

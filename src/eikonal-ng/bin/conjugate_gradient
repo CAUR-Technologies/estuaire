@@ -17,6 +17,7 @@ import scipy as sc
 import scipy.sparse
 import scipy.optimize
 import cPickle as pickle
+from agstd.tools import np_load
 
 try:
     import simplejson as json
@@ -60,7 +61,7 @@ def CGInverse(A, D, P, initial, weighting, batch, max_iter, gtol, stats, itype =
 
     wfun = wtypes[weighting['name']](*weighting['args'])
 
-    AR, D_mat, P_mat, I_vect = [sc.load(s) for s in [A, D, P, initial]]
+    AR, D_mat, P_mat, I_vect = [np_load(s) for s in [A, D, P, initial]]
     weights = wfun(AR['R'])
     A_mat, R_vect = weights * AR['A'], weights * AR['R']
 

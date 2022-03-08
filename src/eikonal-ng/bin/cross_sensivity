@@ -46,7 +46,8 @@ def cross_sensivity_main(velocity, standard_velocity, raypath, grid_id):
 
     description = { grid_id : vgrid.shape }
     if len(raypath['rays']) == 0:
-        return {'residual' : np.array([]), 'description' : description, 'grid_id' : [] }
+        return {'residual' : np.array([]),
+                'description' : description, 'grid_id' : [] }
     max_len = np.max([len(r) for r in raypath['rays']])
 
     indices_buffer = np.zeros(max_len * (4 ** vgrid.ndim) * 2,  dtype = 'uintp')
