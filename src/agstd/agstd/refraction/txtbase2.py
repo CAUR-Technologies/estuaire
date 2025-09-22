@@ -1,5 +1,9 @@
+import os
+import pickle
+
+import numpy as np
+
 import eikonal.data as edata
-from agstd.tools import np_load
 
 evdtype = [('id', 'S100'), ('pos', 'float', 3), ('delta_t', 'float')]
 stdtype = evdtype
@@ -8,31 +12,35 @@ ttdtype = [('stid', 'S100'), ('evid', 'S100'), ('tt', 'float')]
 
 class txtsttable(object):
     def __init__(self, filename):
-        self.data = np.loadtxt(filename, dtype = evdtype)
+        self.data = np.loadtxt(filename, dtype=evdtype)
         self.index = create_index(self.data)
 
     def getTable(self):
-        ary = np.array([(i, e['pos'], e['delta_t']) for i, e in enumerate(self.data)], dtype = [('id', 'int'), ('position', 'float', 3), ('delta_t', 'float')])
+        ary = np.array(
+            [(i, e['pos'], e['delta_t']) for i, e in enumerate(self.data)],
+            dtype=[('id', 'int'), ('position', 'float', 3), ('delta_t', 'float')],
+        )
         return ary
 
 class txttttable(object):
     def __init__(self, filename):
-        self.data = np.sort(np.loadtxt(filename, dtype = ttdtype))
+        self.data = np.sort(np.loadtxt(filename, dtype=ttdtype))
 
-    def splitUnique(self, evindex, stindex, evnfile = None, stafile = None):
+    def splitUnique(self, evindex, stindex, evnfile=None, stafile=None):
         uniques = np.unique(self.data['stid'])
         ind = np.searchsorted(self.data['stid'], uniques[1:])
-        print uniques, ind
+        print(uniques, ind)
         splitted = np.split(self.data, ind)
 
         ary = []
         for sid, stt in zip(uniques, splitted):
-            print sid, stindex[sid]
-            tttable = np.array([(-1, evindex[s['evid']], s['tt']) for s in stt], dtype = [('id', int), ('event_id', int), ('traveltime', float)])
-            ary.append(edata.EKTTTable(tttable, stindex[sid], evnfile = evnfile, stafile = stafile))
+            print(sid, stindex[sid])
+            tttable = np.array(
+                [(-1, evindex[s['evid']], s['tt']) for s in stt],
+                dtype=[('id', int), ('event_id', int), ('traveltime', float)],
+            )
+            ary.append(edata.EKTTTable(tttable, stindex[sid], evnfile=evnfile, stafile=stafile))
         return ary
-
-
 
 
 def create_index(tt):
@@ -41,37 +49,49 @@ def create_index(tt):
         ret[tt[i]['id']] = i
     return ret
 
-import cPickle as pickle
-import numpy as np
-import os
 
-
-def main_txt(input_event, input_station, output_event = None, output_station = None, input_tt = None, output_tt_template = None):
+def main_txt(
+    input_event,
+    input_station,
+    output_event=None,
+    output_station=None,
+    input_tt=None,
+    output_tt_template=None,
+):
     evdata = txtsttable(input_event)
     event_table = edata.EKEventTable(evdata.getTable())
-    if None != output_event:
-        pickle.dump(event_table, open(output_event, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
+    if output_event is not None:
+        with open(output_event, 'wb') as fdesc:
+            pickle.dump(event_table, fdesc, protocol=pickle.HIGHEST_PROTOCOL)
 
     stdata = txtsttable(input_station)
     station_table = edata.EKStationTable(stdata.getTable())
-    if (None != input_station) and (None != output_station):
-        pickle.dump(station_table, open(output_station, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
+    if (input_station is not None) and (output_station is not None):
+        with open(output_station, 'wb') as fdesc:
+            pickle.dump(station_table, fdesc, protocol=pickle.HIGHEST_PROTOCOL)
 
-    if (None != input_tt) and (None != output_tt_template):
+    if (input_tt is not None) and (output_tt_template is not None):
         ttdata = txttttable(input_tt)
-        for tt_table in ttdata.splitUnique(evdata.index, stdata.index, evnfile = os.path.abspath(output_event), stafile = os.path.abspath(output_station)):
+        for tt_table in ttdata.splitUnique(
+            evdata.index,
+            stdata.index,
+            evnfile=os.path.abspath(output_event),
+            stafile=os.path.abspath(output_station),
+        ):
             filename = output_tt_template % tt_table.station_id
-            pickle.dump(tt_table, open(filename, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
+            with open(filename, 'wb') as fdesc:
+                pickle.dump(tt_table, fdesc, protocol=pickle.HIGHEST_PROTOCOL)
 
 
+whole_dtype = [
+    ('event_pos', float, 2),
+    ('station_pos', float, 2),
+    ('traveltime', float),
+]
 
-whole_dtype = [ ('event_pos', float, 2),
-                ('station_pos', float, 2),
-                ('traveltime', float)]
 
-
-def read_in_one_file(input, output_event = None, output_station = None, output_tt_template = None):
-    whole_table = np.loadtxt(input, dtype = whole_dtype)
+def read_in_one_file(input, output_event=None, output_station=None, output_tt_template=None):
+    whole_table = np.loadtxt(input, dtype=whole_dtype)
     evdict = {}
     stdict = {}
     ev_table = []
@@ -90,21 +110,27 @@ def read_in_one_file(input, output_event = None, output_station = None, output_t
             tt_table[stkey] = []
         tt_table[stkey].append((i, evdict[evkey], line['traveltime']))
 
-    ev_ary = edata.EKEventTable(np.array(ev_table, dtype = edata.ev_dtype))
-    st_ary = edata.EKStationTable(np.array(st_table, dtype = edata.st_dtype))
+    ev_ary = edata.EKEventTable(np.array(ev_table, dtype=edata.ev_dtype))
+    st_ary = edata.EKStationTable(np.array(st_table, dtype=edata.st_dtype))
 
-    if output_event != None:
-        pickle.dump(ev_ary, open(output_event, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
-    if output_station != None:
-        pickle.dump(st_ary, open(output_station, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
+    if output_event is not None:
+        with open(output_event, 'wb') as fdesc:
+            pickle.dump(ev_ary, fdesc, protocol=pickle.HIGHEST_PROTOCOL)
+    if output_station is not None:
+        with open(output_station, 'wb') as fdesc:
+            pickle.dump(st_ary, fdesc, protocol=pickle.HIGHEST_PROTOCOL)
 
-    if output_tt_template != None:
-        for k, v in tt_table.iteritems():
+    if output_tt_template is not None:
+        for k, v in tt_table.items():
             filename = output_tt_template % stdict[k]
-            tt_ary = edata.EKTTTable(np.array(v, dtype = edata.tt_dtype), stdict[k], evnfile = output_event, stafile = output_station)
-            pickle.dump(tt_ary, open(filename, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
-
-
+            tt_ary = edata.EKTTTable(
+                np.array(v, dtype=edata.tt_dtype),
+                stdict[k],
+                evnfile=output_event,
+                stafile=output_station,
+            )
+            with open(filename, 'wb') as fdesc:
+                pickle.dump(tt_ary, fdesc, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == "__main__":
@@ -121,9 +147,7 @@ if __name__ == "__main__":
     evtable = edata.EKEventTable(evdata.getTable())
     sttable = edata.EKStationTable(stdata.getTable())
 
-    print evtable.data
-    print sttable.data
-    print [t.station_id for t in ttdata.splitUnique(evdata.index, stdata.index)]
+    print(evtable.data)
+    print(sttable.data)
+    print([t.station_id for t in ttdata.splitUnique(evdata.index, stdata.index)])
     """
-
-

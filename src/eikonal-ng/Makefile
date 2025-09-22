@@ -33,7 +33,7 @@ clean:
 templates : build/include/nvect.hpp build/include/narray.hpp build/include/solver.hpp build/include/raytrace.hpp build/solver.pyx build/raytrace.pyx
 
 python_package: build/include/narray.hpp build/include/solver.hpp build/include/raytrace.hpp eikonal/* templates/solver.hpp.mako
-	python setup.py build
+	python3 -m build --wheel
 
 
 build/include/%.hpp : templates/%.hpp.mako
@@ -45,4 +45,3 @@ build/%.pyx : templates/%.pyx.mako src/eikonal/%.pxd
 	@touch build/eikonal/__init__.py
 	@cp src/eikonal/*.pxd build/eikonal/
 	$(RENDERER) $< > $@
-

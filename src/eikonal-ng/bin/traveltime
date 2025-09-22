@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # @Author : Jean-Pascal Mercier <jean-pascal.mercier@agsis.com>
 #
@@ -10,7 +10,6 @@ __doc__ = """
 """
 import agstd.main as main
 
-import cPickle as pickle
 import numpy as np
 import scipy as sc
 import scipy.sparse
@@ -21,8 +20,6 @@ import eikonal.raytrace as raytrace
 import eikonal.solver as esolver
 
 import sys
-
-from itertools import izip
 
 sys.stdout = sys.stderr
 
@@ -43,4 +40,3 @@ def traveltime(velocity, station, event, eventlst, spacing, h):
 
 if __name__ == "__main__":
     main.main(sensivity, spacing = float)
-

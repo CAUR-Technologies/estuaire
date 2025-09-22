@@ -3,13 +3,10 @@
 #
 # vim: ts=4 sw=4 sts=0 noexpandtab:
 import logging
-import traceback
-import new
 import os
 import time
 
 from functools import wraps
-from itertools import izip
 
 import numpy
 
@@ -27,11 +24,15 @@ class buggy(object):
     def __call__(self, fct):
         @wraps(fct)
         def wrapper(*args, **kwargs):
-            logger.warning("%s is buggy, use at your own risk. Expected fix : %s" % (fct.__name__, self.date))
+            logger.warning(
+                "%s is buggy, use at your own risk. Expected fix : %s",
+                fct.__name__,
+                self.date,
+            )
             try:
                 return_value = fct(*args, **kwargs)
             except Exception:
-                print "%s Crashed : Didn't i told you it was buggy ?" % (fct.__name__)
+                logger.exception("%s crashed: the function is marked buggy.", fct.__name__)
                 raise
             return return_value
         return wrapper
@@ -49,7 +50,11 @@ class unimplemented(object):
     def __call__(self, fct):
         @wraps(fct)
         def wrapper(*args, **kwargs):
-            logger.warning("%s is not_implemented ... now. Expected : %s " % (fct.__name__, self.date))
+            logger.warning(
+                "%s is not implemented; expected availability: %s",
+                fct.__name__,
+                self.date,
+            )
         return wrapper
 
 
@@ -65,7 +70,11 @@ class broken(object):
     def __call__(self, fct):
         @wraps(fct)
         def wrapper(*args, **kwargs):
-            logger.critical("%s is broken -- DON'T USE IT. Expected fix : %s" % (fct.__name__, self.date))
+            logger.critical(
+                "%s is broken -- DON'T USE IT. Expected fix : %s",
+                fct.__name__,
+                self.date,
+            )
         return wrapper
 
 
@@ -77,7 +86,7 @@ def deprecated(fct):
     """
     @wraps(fct)
     def wrapper(*args, **kwargs):
-        logger.warning("Call to deprecated function %s." % (fct.__name_))
+        logger.warning("Call to deprecated function %s.", fct.__name__)
         return fct(*args, **kwargs)
     return wrapper
 
@@ -88,18 +97,21 @@ def loggedcall(fct):
     """
     @wraps(fct)
     def wrapper(*args, **kwargs):
-        logger.info("Function -- %s--  called with arguments -- %s -- and keywords -- %s --" % \
-                    (fct.__name__, str(args), str(kwargs)))
+        logger.info(
+            "Function -- %s--  called with arguments -- %s -- and keywords -- %s --",
+            fct.__name__,
+            args,
+            kwargs,
+        )
         return_value = fct(*args, **kwargs)
-        logger.info("Function -- %s -- returned -- %s --" % \
-                    (fct.__name__, return_value))
+        logger.info("Function -- %s -- returned -- %s --", fct.__name__, return_value)
         return return_value
     return wrapper
 
 
 def addmethod(instance):
     def decorator(fct):
-        setattr(instance, fct.func_name, fct)
+        setattr(instance, fct.__name__, fct)
         return fct
     return decorator
 
@@ -116,41 +128,46 @@ class memoizehd(object):
         basepath = os.path.join("/tmp", basepath)
         try:
             os.stat(basepath)
-        except:
+        except OSError:
             os.mkdir(basepath)
         self.basepath = basepath
-        print self.basepath
+        logger.debug("memoizehd cache base path: %s", self.basepath)
 
     def __call__(self, fct):
         cachebase = os.path.join(self.basepath, str(hash(fct)) + "_" + str(os.getpid()))
         @wraps(fct)
         def wrapper(*args, **kwargs):
-            cachefile = cachebase + ''.join([str(i) for i in map(hash, args)])
-            cachefile += '_'.join([str(hash(kwargs[i])) for i in kwargs]) + ".npy"
+            cachefile = cachebase + ''.join(str(hash(arg)) for arg in args)
+            cachefile += '_'.join(str(hash(kwargs[key])) for key in sorted(kwargs)) + ".npy"
             try:
                 os.stat(cachefile)
-                logger.info("Parameters hash matched calling -- %s --, reading cached return from file " % \
-                (fct.__name__))
-                return_value = numpy.load(cachefile)
-            except:
+                logger.info(
+                    "Parameters hash matched calling -- %s --, reading cached return from file",
+                    fct.__name__,
+                )
+                return_value = numpy.load(cachefile, allow_pickle=True)
+            except OSError:
                 return_value = fct(*args, **kwargs)
-                numpy.save(cachefile, return_value)
+                numpy.save(cachefile, return_value, allow_pickle=True)
             return return_value
         return wrapper
 
 def memoize(fct):
-	"""
-	This is a decorator which cache the result of a function based on the 
-	given parameter.
-	"""
-	return_dict = {}
+    """Cache the result of a function based on positional arguments."""
 
-	@wraps(fct)
-	def wrapper(*args, **kwargs):
-		if args not in return_dict:
-			return_dict[args] = fct(*args, **kwargs)
-		return return_dict[args]
-	return wrapper
+    return_dict = {}
+
+    @wraps(fct)
+    def wrapper(*args, **kwargs):
+        if kwargs:
+            key = (args, tuple(sorted(kwargs.items())))
+        else:
+            key = args
+        if key not in return_dict:
+            return_dict[key] = fct(*args, **kwargs)
+        return return_dict[key]
+
+    return wrapper
 
 
 def timedcall(fct):
@@ -158,7 +175,6 @@ def timedcall(fct):
     def wrapper(*args, **kwargs):
         t = time.time()
         return_value = fct(*args, **kwargs)
-        logger.info("Function -- %s -- called : TIME -- %.4f --" % \
-                    (fct.__name__, time.time() - t))
+        logger.info("Function -- %s -- called : TIME -- %.4f --", fct.__name__, time.time() - t)
         return return_value
     return wrapper

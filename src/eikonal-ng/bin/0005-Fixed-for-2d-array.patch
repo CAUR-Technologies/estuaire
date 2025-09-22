@@ -18,7 +18,7 @@ index 75a471d..1468134 100755
  import agstd.main as main
 -import agstd.sdb.dbase as dbase
  
- import cPickle as pickle
+import pickle
  import numpy as np
 @@ -48,7 +47,7 @@ def buildray(arrival, velocity, traveltime, h = 1):
      stdesc = tttable.station_row
@@ -55,7 +55,7 @@ index c7b6524..7377eab 100755
 @@ -73,7 +74,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
                  "description" : description}
  
-     for i in xrange(len(current_events)):
+    for i in range(len(current_events)):
 -        finish = tuple(arrival.transform_to(current_events[i]['position']))
 +        finish = tuple(arrival.transform_to(current_events[i]['position'][:len(arrival.shape)]))
          rtt, ind, sens = raytrace.sensivity(agrid, vgrid, start, finish,
@@ -63,4 +63,3 @@ index c7b6524..7377eab 100755
                                              sensivity_buffer,
 -- 
 1.7.5.4
-

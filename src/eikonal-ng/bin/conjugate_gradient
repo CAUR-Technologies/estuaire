@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # @Author : Jean-Pascal Mercier <jean-pascal.mercier@agsis.com>
 #
 # @Copyright (C) 2010 Jean-Pascal Mercier
@@ -16,12 +16,12 @@ import numpy as np
 import scipy as sc
 import scipy.sparse
 import scipy.optimize
-import cPickle as pickle
+import pickle
 from agstd.tools import np_load
 
 try:
     import simplejson as json
-except ImportError, e:
+except ImportError:
     import json
 
 
@@ -90,7 +90,7 @@ def CGInverse(A, D, P, initial, weighting, batch, max_iter, gtol, stats, itype =
         R_vect = R_vect / norm
 
         def callback(m):
-            print m.min(), m.max()
+            print(m.min(), m.max())
 
         f = linear.CGObj(A_mat, R_vect, I_vect, DT_mat, P_mat)
         X = scipy.optimize.fmin_ncg(f, X0, f.fprime, fhess_p = f.fhess_p, maxiter = max_iter, callback = callback)

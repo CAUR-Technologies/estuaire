@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # @Author : Jean-Pascal Mercier <jean-pascal.mercier@agsis.com>
 #
@@ -113,7 +113,7 @@ def esolve(velocity, seeds, subgrid_spacing = 10, second_order = True, spacing =
     for s in seeds:
         if not check_boundary(s, velocity.shape):
             # log.critical("Seed outside grid boundary")
-            print "Seed outside grid boundary"
+            print("Seed outside grid boundary")
             sys.exit(1)
 
     # Disabled until more testing

@@ -29,6 +29,7 @@ import sys
 
 import agstd.main as main
 
+
 def cross_sensivity_main(velocity, standard_velocity, raypath, grid_id):
     """
     :param velocity: The velocity we want to inverse (EKImageGrid)
@@ -72,11 +73,8 @@ def cross_sensivity_main(velocity, standard_velocity, raypath, grid_id):
     GA = sc.sparse.coo_matrix((Gfrechet, (Gindices_Y, Gindices_X)),
                               (len(r), vgrid.size)).tocsr()
 
-
-
     return {"residual" : r, grid_id : GA,
             "description" : description}
-
 
 
 if __name__ == "__main__":

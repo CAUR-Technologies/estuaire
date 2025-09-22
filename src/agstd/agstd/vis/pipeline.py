@@ -1,4 +1,4 @@
-import os, sys
+import os
 
 import enthought.mayavi.core.api as mcore
 import enthought.mayavi.sources.api as msources
@@ -14,10 +14,10 @@ def __build_object__(obj, element):
             setattr(subobj, prop, getattr(subobj, prop).__class__(element.attrib[prop]))
         for i in element.iterchildren():
             __build_object__(subobj, i)
-    except AttributeError, e:
-            __build_object__(subobj, element)
-    except Exception, e:
-        print e
+    except AttributeError:
+        __build_object__(subobj, element)
+    except Exception as exc:
+        print(exc)
 
 def __build_module_manager__(element, engine, parent = None):
     mmobj = mcore.ModuleManager()
@@ -28,7 +28,7 @@ def __build_module_manager__(element, engine, parent = None):
             childs.append(build_type[t](child, engine, parent = mmobj))
     for i in element.iterchildren():
         if i.tag not in ['Module']:
-            print i.tag
+            print(i.tag)
             __build_object__(mmobj, i)
 
     return (mmobj, childs)

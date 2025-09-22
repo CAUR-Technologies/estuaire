@@ -8,58 +8,74 @@
 __doc__ = """
 """
 
-import inspect
 import argparse
-import cPickle as pickle
+import inspect
+import os
+import pickle
+import sys
+from typing import Any, Dict, Iterable, Sequence
+
 import numpy as np
 
-import os
-import sys
+
+def _iter_required_optional(
+    args: Sequence[str], defaults: Sequence[Any]
+) -> tuple[Iterable[str], Iterable[tuple[str, Any]]]:
+    if not defaults:
+        return args, []
+    split_index = len(args) - len(defaults)
+    return args[:split_index], zip(args[split_index:], defaults)
 
 
 def main(fct, **descr):
-    """
-    """
+    """Turn a callable into a small argparse-powered CLI."""
+
     parser = argparse.ArgumentParser(description=fct.__doc__)
-    fct_descr = inspect.getargspec(fct)
-    if "output" not in fct_descr.args:
+    spec = inspect.getfullargspec(fct)
+    args = list(spec.args or [])
+    defaults = list(spec.defaults or [])
+
+    if "output" not in args:
         parser.add_argument("--output")
     parser.add_argument("--info")
 
-    ndefaults = -len(fct_descr.defaults) if fct_descr.defaults \
-                                            is not None else None
-    for arg in fct_descr.args[:ndefaults]:
-        arg_descr = dict()
-        if arg in descr:
-            arg_descr['type'] = descr[arg]
-        parser.add_argument("--" + arg, required=True, **arg_descr)
+    required_args, optional_args = _iter_required_optional(args, defaults)
 
-    if ndefaults is not None:
-        for arg, value in zip(fct_descr.args[ndefaults:], fct_descr.defaults):
-            arg_descr = dict()
-            if arg in descr:
-                arg_descr['type'] = descr[arg]
-            parser.add_argument("--" + arg, required = False, default = value, **arg_descr)
+    for arg in required_args:
+        arg_descr: Dict[str, Any] = {}
+        if arg in descr:
+            arg_descr["type"] = descr[arg]
+        parser.add_argument(f"--{arg}", required=True, **arg_descr)
+
+    for arg, value in optional_args:
+        arg_descr: Dict[str, Any] = {}
+        if arg in descr:
+            arg_descr["type"] = descr[arg]
+        parser.add_argument(f"--{arg}", required=False, default=value, **arg_descr)
 
     ns = parser.parse_args()
-    argv = [getattr(ns, a) for a in fct_descr[0]]
+    argv = [getattr(ns, a) for a in args]
 
     result = fct(*argv)
 
     info = " ".join(sys.argv)
 
-    if np.all(result != None) and (ns.output != None) and \
-            ("output" not in fct_descr.args):
-        if os.path.isdir(ns.output):
-            for k in result:
-                fname = os.path.join(ns.output, k)
-                pickle.dump(result[k], open(fname, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
-                info += '\n     --> %s' % fname
+    output_target = getattr(ns, "output", None)
+    if result is not None and output_target is not None and "output" not in args:
+        output_path = os.path.expanduser(output_target)
+        if os.path.isdir(output_path) and isinstance(result, dict):
+            for key, value in result.items():
+                fname = os.path.join(output_path, key)
+                with open(fname, "wb") as fdesc:
+                    pickle.dump(value, fdesc, protocol=pickle.HIGHEST_PROTOCOL)
+                info += f"\n     --> {fname}"
         else:
-            dirname = os.path.dirname(ns.output)
-            pickle.dump(result, open(ns.output, 'wb'), protocol = pickle.HIGHEST_PROTOCOL)
-            info += '\n     --> %s' % ns.output
+            os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+            with open(output_path, "wb") as fdesc:
+                pickle.dump(result, fdesc, protocol=pickle.HIGHEST_PROTOCOL)
+            info += f"\n     --> {output_path}"
 
-    if ns.info != None:
-        with open(ns.info, 'w') as f:
-            f.write(info)
+    info_target = getattr(ns, "info", None)
+    if info_target is not None:
+        with open(info_target, "w", encoding="utf-8") as fdesc:
+            fdesc.write(info)

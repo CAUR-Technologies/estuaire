@@ -57,17 +57,17 @@ def linearFilter2(stencil, shape):
 
 def linearFilter3(stencil, shape):
     size = np.prod(shape)
-    Xmin = (stencil.shape[2] - 1) / 2
-    Ymin = (stencil.shape[1] - 1) / 2
-    Zmin = (stencil.shape[0] - 1) / 2
+    Xmin = (stencil.shape[2] - 1) // 2
+    Ymin = (stencil.shape[1] - 1) // 2
+    Zmin = (stencil.shape[0] - 1) // 2
 
 
     dias = []
     poss = []
 
-    for k, z in enumerate(xrange(-Zmin, Zmin + 1)):
-        for j, y in enumerate(xrange(-Ymin, Ymin + 1)):
-            for i, x in enumerate(xrange(-Xmin, Xmin + 1)):
+    for k, z in enumerate(range(-Zmin, Zmin + 1)):
+        for j, y in enumerate(range(-Ymin, Ymin + 1)):
+            for i, x in enumerate(range(-Xmin, Xmin + 1)):
                 pos = z * shape[-1] * shape[-2] + y * shape[-1] + x
                 dias.append([0.0] * Xmin + [stencil[k, j, i]] * (shape[-1] - 2 * Xmin) + [0.0] * Xmin)
                 dias[-1] = [0.0] * (shape[2] * Ymin) + dias[-1] * (shape[1] - 2 * Ymin) + [0.0] * (shape[2] * Ymin)
@@ -116,8 +116,6 @@ def laplaceOP(X, Y, Z):
         d2z = sc.sparse.dia_matrix(([left, center, right], [-X, 0.0, +X]),
                                   (size, size),
                                   dtype = 'float')
-
-           
 
     return d2x + d2y + d2z
 
@@ -239,17 +237,17 @@ def linearFilter2(stencil, shape):
 
 def linearFilter3(stencil, shape):
     size = np.prod(shape)
-    Xmin = (stencil.shape[2] - 1) / 2
-    Ymin = (stencil.shape[1] - 1) / 2
-    Zmin = (stencil.shape[0] - 1) / 2
+    Xmin = int((stencil.shape[2] - 1) // 2)
+    Ymin = int((stencil.shape[1] - 1) // 2)
+    Zmin = int((stencil.shape[0] - 1) // 2)
 
 
     dias = []
     poss = []
 
-    for k, z in enumerate(xrange(-Zmin, Zmin + 1)):
-        for j, y in enumerate(xrange(-Ymin, Ymin + 1)):
-            for i, x in enumerate(xrange(-Xmin, Xmin + 1)):
+    for k, z in enumerate(range(-Zmin, Zmin + 1)):
+        for j, y in enumerate(range(-Ymin, Ymin + 1)):
+            for i, x in enumerate(range(-Xmin, Xmin + 1)):
                 pos = z * shape[-1] * shape[-2] + y * shape[-1] + x
                 dias.append([0.0] * Xmin + [stencil[k, j, i]] * (shape[-1] - 2 * Xmin) + [0.0] * Xmin)
                 dias[-1] = [0.0] * (shape[2] * Ymin) + dias[-1] * (shape[1] - 2 * Ymin) + [0.0] * (shape[2] * Ymin)
@@ -308,8 +306,8 @@ class CGInversion(object):
             yield m, 0
             return
 
-        for i in xrange(maxiter / batch):
-            for j in xrange(batch):
+        for i in range(maxiter // batch):
+            for j in range(batch):
                 # This line calculate the first half of the hessian
                 ridot = np.dot(ri, ri)
 

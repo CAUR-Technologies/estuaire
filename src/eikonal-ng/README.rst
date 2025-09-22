@@ -1,6 +1,20 @@
 Eikonal Solver
----------------
+--------------
 The enclosed PDE solver was developped to solve the Eikonal Equation subject to boundary condition.
+
+Building (Python 3)
+-------------------
+
+The project now targets Python 3 toolchains.  The Cython sources are rendered
+from Mako templates during the build step, so no manual preprocessing is
+required.  A typical build looks like::
+
+    python -m pip install --upgrade pip
+    python -m pip install build
+    python -m build --wheel
+
+This generates a wheel in ``dist/`` containing the ``eikonal`` package.  The
+legacy OpenCL experiments have been removed as part of the port to Python 3.
 
 .. math::
     |\Delta u(x)| = f(x)
@@ -22,4 +36,3 @@ The low level API for the eikonal solver and the raytracing is for internal use 
 
 Python API
 -----------
-

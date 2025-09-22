@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # @Author : Jean-Pascal Mercier <jean-pascal.mercier@agsis.com>
 #
@@ -10,7 +10,6 @@ __doc__ = """
 """
 import agstd.main as main
 
-import cPickle as pickle
 import numpy as np
 import scipy as sc
 import scipy.sparse
@@ -20,14 +19,12 @@ import eikonal.raytrace as raytrace
 
 import sys
 
-from itertools import izip
 from agstd.tools import np_load
 
 sys.stdout = sys.stderr
 
 
-
-def sensivity(arrival, velocity, traveltime, grid_id, h = None):
+def sensivity(arrival, velocity, traveltime, grid_id, h=None):
     if h is None:
         h = 1
     h = float(h)
@@ -40,7 +37,6 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
     current_events = tttable.event_rows
 
     agrid = arrival.data
-
 
     vgrid = velocity.data
 
@@ -74,7 +70,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
                 "event_time" : None, "event_position" : None,
                 "description" : description}
 
-    for i in xrange(len(current_events)):
+    for i in range(len(current_events)):
         finish = tuple(arrival.transform_to(current_events[i]['position'][:len(arrival.shape)]))
         rtt, ind, sens = raytrace.sensivity(agrid, vgrid, start, finish,
                                             indices_buffer,
@@ -90,7 +86,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
 
 
         # Calculation of the Frechet Derivative for the Event position
-        for j in xrange(len(finish)):
+        for j in range(len(finish)):
             delta = 0.1
             new_finish = list(finish)
             new_finish[j] += delta
@@ -135,7 +131,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h = None):
 
 
     # Frechet Derivative for the Station time
-    SA_Y = ETA_Y = range(len(r))
+    SA_Y = ETA_Y = np.arange(len(r))
     SA_X = [tttable.station_id] * len(r)
     SA_V =  [-1] * len(r)
     SA = sc.sparse.coo_matrix((SA_V, (SA_Y, SA_X)),

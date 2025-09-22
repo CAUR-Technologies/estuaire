@@ -5,3 +5,7 @@
 #
 # All rights reserved.
 #
+
+from .frechet import compute_frechet
+
+__all__ = ["compute_frechet"]

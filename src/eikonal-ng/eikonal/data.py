@@ -12,7 +12,7 @@ TODO : BIG DESCRIPTION OF EXCHANGE DATA
 """
 
 import numpy as np
-import cPickle as pickle
+import pickle
 import copy
 
 from agstd.decorators import memoize
@@ -46,7 +46,7 @@ class EKTTTable(object):
             sys.stderr.write(str(data.size))
             sys.stderr.flush()
             data = np.array(data.__getitem__([tname for tname, ttype in tt_dtype]), dtype = self.dtype)
-        except ValueError, e:
+        except ValueError:
             data = np.asarray(data, dtype = self.dtype)
 
         self.data               = data
@@ -82,7 +82,7 @@ class EKPunctualData(object):
             for tname, ttype in self.dtype:
                 data[tname]
             self.data = data
-        except ValueError, e:
+        except ValueError:
             self.data = np.asarray(data, dtype = self.dtype)
 
         self.origin = tuple([0] * data['position'].shape[-1]) if origin is None else origin
@@ -171,7 +171,6 @@ class EKImageData(object):
         pass
 
     ### ADDING method to save and load on data from/to NLL
-
 
 
 
