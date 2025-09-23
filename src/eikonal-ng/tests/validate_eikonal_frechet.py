@@ -45,7 +45,6 @@ ORIGIN = (0.0, 0.0)
 GRID_SHAPE = (40, 40)
 TOL = 1e-3
 
-
 def _build_test_grid() -> np.ndarray:
     """Return a constant-velocity grid."""
 
@@ -123,58 +122,68 @@ def main() -> None:
     sources = np.vstack([base_sources, base_sources[:2]])
     receivers = np.vstack([base_receivers, base_receivers[:2]])
 
-    # Pairwise slowness (returns path lengths) with travel times
-    slowness_rows, travel_times = compute_frechet(
-        velocity,
-        sources,
-        receivers,
-        spacing=SPACING,
-        origin=ORIGIN,
-        pairwise=True,
-        cell_slowness=True,
-        return_travel_times=True,
-        rk_step=1.0,
-        second_order=True,
-    )
+    velocity = velocity + np.random.randn(velocity.shape[0], velocity.shape[1]) * 500
 
-    _check_slowness_pairwise(slowness_rows, travel_times, sources, receivers)
+    # Pairwise slowness (returns path lengths) with travel times
+slowness_matrix, travel_times = compute_frechet(
+    velocity,
+    sources,
+    receivers,
+    spacing=SPACING,
+    origin=ORIGIN,
+    pairwise=True,
+    cell_slowness=True,
+    return_travel_times=True,
+    rk_step=1.0,
+    second_order=True,
+)
+slowness_rows = slowness_matrix.toarray()
+
+_check_slowness_pairwise(slowness_rows, travel_times, sources, receivers)
 
     # Dense tensor (no pairwise collapse)
-    slowness_full, travel_full = compute_frechet(
-        velocity,
-        sources,
-        receivers,
-        spacing=SPACING,
-        origin=ORIGIN,
-        pairwise=False,
-        cell_slowness=True,
-        return_travel_times=True,
-        rk_step=1.0,
-        second_order=True,
-    )
+slowness_full_matrix, travel_full = compute_frechet(
+    velocity,
+    sources,
+    receivers,
+    spacing=SPACING,
+    origin=ORIGIN,
+    pairwise=False,
+    cell_slowness=True,
+    return_travel_times=True,
+    rk_step=1.0,
+    second_order=True,
+)
 
-    _check_pairwise_vs_full(slowness_rows, slowness_full, travel_times, travel_full)
+orig_shape = getattr(slowness_full_matrix, 'original_shape', None)
+slowness_full = slowness_full_matrix.toarray()
+if orig_shape is not None:
+    slowness_full = slowness_full.reshape(*orig_shape, slowness_full_matrix.shape[1])
 
-    # Velocity parameterisation should simply scale rows element-wise
-    velocity_rows = compute_frechet(
-        velocity,
-        sources,
-        receivers,
-        spacing=SPACING,
-        origin=ORIGIN,
-        pairwise=True,
-        cell_slowness=False,
-        return_travel_times=False,
-        rk_step=1.0,
-        second_order=True,
-    )
+_check_pairwise_vs_full(slowness_rows, slowness_full, travel_times, travel_full)
 
-    _check_velocity_parameterisation(slowness_rows, velocity_rows)
+# Velocity parameterisation should simply scale rows element-wise
+velocity_matrix = compute_frechet(
+    velocity,
+    sources,
+    receivers,
+    spacing=SPACING,
+    origin=ORIGIN,
+    pairwise=True,
+    cell_slowness=False,
+    return_travel_times=False,
+    rk_step=1.0,
+    second_order=True,
+)
 
-    print(
-        "Validation successful: eikonal.frechet produces consistent sensitivities "
-        f"for {sources.shape[0]} sources/receivers (grid size {velocity.size})."
-    )
+velocity_rows = velocity_matrix.toarray()
+
+_check_velocity_parameterisation(slowness_rows, velocity_rows)
+
+print(
+    "Validation successful: eikonal.frechet produces consistent sensitivities "
+    f"for {sources.shape[0]} sources/receivers (grid size {velocity.size})."
+)
 
 
 if __name__ == "__main__":
