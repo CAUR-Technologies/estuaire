@@ -269,7 +269,7 @@ class BuildExt(build_ext):
 
 setup(
     name="estuaire",
-    version="0.1.0",
+    version="1.0.0",
     description="Fast marching estuaire solver with ray tracing",
     author="J.-P. Mercier",
     packages=["estuaire", "estuaire.core"],

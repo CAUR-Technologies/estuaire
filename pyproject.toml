@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "estuaire"
-version = "0.1.0"
+version = "1.0.0"
 description = "Fast marching estuaire solver with ray tracing"
 authors = [{ name = "J.-P. Mercier" }]
 readme = "README.md"
