@@ -6,6 +6,6 @@
 # All rights reserved.
 #
 
-from .frechet import compute_frechet, compute_sparse_sensitivity
-
-__all__ = ["compute_frechet", "compute_sparse_sensitivity"]
+# from .frechet import compute_frechet, compute_sparse_sensitivity
+#
+# __all__ = ["compute_frechet", "compute_sparse_sensitivity"]

@@ -14,15 +14,12 @@ from typing import Iterable, Optional, Sequence, Tuple, Union
 import numpy as np
 import scipy.sparse as sparse
 
-from . import raytrace, solver
+from eikonal import raytrace, solver
 from .data import EKImageData
 
 from tqdm import tqdm
 
 ArrayLike = Union[Sequence[float], np.ndarray]
-
-
-
 
 def compute_frechet(
     velocity: Union[EKImageData, np.ndarray],

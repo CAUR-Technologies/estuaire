@@ -1,7 +1,12 @@
 [build-system]
-requires = ["setuptools>=69", "wheel", "Cython>=3.0", "numpy>=1.26", "Mako>=1.3"]
+requires = [
+  "setuptools>=69",
+  "wheel",
+  "Cython>=3.0",   # build-time only
+  "numpy>=1.26",   # build-time headers for Cython extensions
+  "Mako>=1.3"      # build-time for template rendering
+]
 build-backend = "setuptools.build_meta"
-
 
 [project]
 name = "eikonal"
@@ -11,9 +16,27 @@ authors = [{ name = "J.-P. Mercier" }]
 readme = "README.md"
 requires-python = ">=3.10"
 
+# RUNTIME dependencies (what users need to import/use your package)
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "tqdm>=4.65",
+  # add others you import at runtime, e.g. "matplotlib>=3.7" if needed
+]
+
+# Optional extras for users to opt in (e.g., plotting, CLI, dev/test)
+[project.optional-dependencies]
+vis = ["matplotlib>=3.7"]
+dev = ["pytest>=7", "pytest-cov", "ruff", "mypy"]
+
 [tool.setuptools.package-data]
 "eikonal" = ["**/*.pxd", "**/*.pyi", "**/*.hpp"]
 
 [tool.setuptools.exclude-package-data]
 "eikonal" = ["**/*.hpp.mako", "**/*.pyx.mako", "**/*.pxd.mako"]
+
+# (Optional) auto-discover packages instead of hard-coding the list
+[tool.setuptools.packages.find]
+where = ["."]
+
 
