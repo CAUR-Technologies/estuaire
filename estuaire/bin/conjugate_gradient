@@ -9,7 +9,7 @@ __doc__ = """
 """
 
 import agstd.main as main
-import eikonal.linear as linear
+import estuaire.linear as linear
 
 import numpy as np
 import scipy as sc

@@ -1,4 +1,4 @@
-Eikonal=/home/jee/work/AGSIS-local/development/eikonal-ng CD=. filter="Makefile *py LICENSE" {
+estuaire=/home/jee/work/AGSIS-local/development/estuaire-ng CD=. filter="Makefile *py LICENSE" {
  Makefile
  config.py
  setup.py
@@ -15,17 +15,17 @@ Eikonal=/home/jee/work/AGSIS-local/development/eikonal-ng CD=. filter="Makefile 
  src=src CD=. filter="*.cpp *.pyx" {
   test.cpp
  }
- pxd=src/eikonal filter="*.pxd" {
+ pxd=src/estuaire filter="*.pxd" {
   raytrace.pxd
   solver.pxd
  }
- py=eikonal filter="*.py" {
+ py=estuaire filter="*.py" {
   __init__.py
   cllinear.py
-  geikonal.py
+  gestuaire.py
   linear.py
  }
- clapi=eikonal/clapi filter="*.py" {
+ clapi=estuaire/clapi filter="*.py" {
   __init__.py
   cg_inverse.py
   dd.py

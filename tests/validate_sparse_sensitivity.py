@@ -13,14 +13,14 @@ from pathlib import Path
 
 import numpy as np
 
-from eikonal import solver
+from estuaire import solver
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from eikonal.data import EKEventTable, EKImageData, EKStationTable, EKTTTable
-from eikonal.frechet import compute_frechet, compute_sparse_sensitivity
+from estuaire.data import EKEventTable, EKImageData, EKStationTable, EKTTTable
+from estuaire.frechet import compute_frechet, compute_sparse_sensitivity
 
 
 VELOCITY = 3_000.0

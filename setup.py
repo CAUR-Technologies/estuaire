@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Setuptools build script for the eikonal fast-marching extensions.
+"""Setuptools build script for the estuaire fast-marching extensions.
 
 Notes:
 - Under PEP 517 build isolation, declare build-time deps in pyproject.toml:
@@ -21,9 +21,9 @@ from distutils import sysconfig
 HERE = Path(__file__).resolve().parent
 BUILD_DIR = HERE / "build"
 INCLUDE_DIR = BUILD_DIR / "include"
-PYX_DIR = BUILD_DIR / "eikonal"
+PYX_DIR = BUILD_DIR / "estuaire"
 TEMPLATES_DIR = HERE / "templates"
-PXD_SRC_DIR = HERE / "src" / "eikonal"
+PXD_SRC_DIR = HERE / "src" / "estuaire"
 
 
 def render_template(src: Path, dest: Path) -> None:
@@ -70,12 +70,12 @@ COMMON_ARGS = {
 
 extensions = [
     Extension(
-        "eikonal.solver",
+        "estuaire.solver",
         sources=[str(BUILD_DIR / "solver.pyx")],
         **COMMON_ARGS,
     ),
     Extension(
-        "eikonal.raytrace",
+        "estuaire.raytrace",
         sources=[str(BUILD_DIR / "raytrace.pyx")],
         **COMMON_ARGS,
     ),
@@ -268,11 +268,11 @@ class BuildExt(build_ext):
 
 
 setup(
-    name="eikonal",
+    name="estuaire",
     version="0.1.0",
-    description="Fast marching eikonal solver with ray tracing",
+    description="Fast marching estuaire solver with ray tracing",
     author="J.-P. Mercier",
-    packages=["eikonal", "eikonal.core"],
+    packages=["estuaire", "estuaire.core"],
     include_package_data=True,
     ext_modules=extensions,
     cmdclass={"build_ext": BuildExt},

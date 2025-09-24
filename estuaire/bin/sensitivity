@@ -13,7 +13,7 @@ import agstd.main as main
 import numpy as np
 import scipy as sc
 
-import eikonal.raytrace as raytrace
+import estuaire.raytrace as raytrace
 
 import sys
 
@@ -97,7 +97,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h=None):
             new_finish[j] -= 2 * delta
             new_finish2 = tuple(new_finish)
 
-            perturbated_tt1 = eikonal.bin.traveltime(
+            perturbated_tt1 = estuaire.bin.traveltime(
                 agrid,
                 vgrid,
                 start,
@@ -106,7 +106,7 @@ def sensivity(arrival, velocity, traveltime, grid_id, h=None):
                 h=h,
             )
 
-            perturbated_tt2 = eikonal.bin.traveltime(
+            perturbated_tt2 = estuaire.bin.traveltime(
                 agrid,
                 vgrid,
                 start,

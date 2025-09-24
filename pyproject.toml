@@ -9,9 +9,9 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "eikonal"
+name = "estuaire"
 version = "0.1.0"
-description = "Fast marching eikonal solver with ray tracing"
+description = "Fast marching estuaire solver with ray tracing"
 authors = [{ name = "J.-P. Mercier" }]
 readme = "README.md"
 requires-python = ">=3.10"
@@ -30,10 +30,10 @@ vis = ["matplotlib>=3.7"]
 dev = ["pytest>=7", "pytest-cov", "ruff", "mypy"]
 
 [tool.setuptools.package-data]
-"eikonal" = ["**/*.pxd", "**/*.pyi", "**/*.hpp"]
+"estuaire" = ["**/*.pxd", "**/*.pyi", "**/*.hpp"]
 
 [tool.setuptools.exclude-package-data]
-"eikonal" = ["**/*.hpp.mako", "**/*.pyx.mako", "**/*.pxd.mako"]
+"estuaire" = ["**/*.hpp.mako", "**/*.pyx.mako", "**/*.pxd.mako"]
 
 # (Optional) auto-discover packages instead of hard-coding the list
 [tool.setuptools.packages.find]

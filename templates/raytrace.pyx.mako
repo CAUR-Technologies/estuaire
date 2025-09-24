@@ -33,7 +33,7 @@ All the raytracing methods use a Runge-Kutta (RK4) integrator.
 """
 
 
-from eikonal.solver cimport *
+from estuaire.solver cimport *
 
 cimport numpy as cnp
 import  numpy as np

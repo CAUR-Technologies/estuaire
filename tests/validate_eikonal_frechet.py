@@ -1,7 +1,7 @@
-"""Validation harness for :mod:`eikonal.frechet`.
+"""Validation harness for :mod:`estuaire.frechet`.
 
 The script mirrors the high-level checks found in ``uquake/tests`` but exercises
-the new :func:`eikonal.frechet.compute_frechet` helper directly.  It verifies that
+the new :func:`estuaire.frechet.compute_frechet` helper directly.  It verifies that
 
 * path-length sensitivities (slowness parameterisation) sum to the Euclidean
   source/receiver distance;
@@ -10,11 +10,11 @@ the new :func:`eikonal.frechet.compute_frechet` helper directly.  It verifies th
   ``-L / v**2`` scaling;
 * pairwise mode matches the dense ``(N_src, N_rcv, N_cells)`` output.
 
-Run the script from ``libraries/estuary/src/eikonal`` after building the C++
+Run the script from ``libraries/estuary/src/estuaire`` after building the C++
 extensions, e.g.::
 
     python setup.py build_ext --inplace
-    python tests/validate_eikonal_frechet.py
+    python tests/validate_estuaire_frechet.py
 """
 
 from __future__ import annotations
@@ -31,10 +31,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 try:
-    from eikonal.frechet import compute_frechet
+    from estuaire.frechet import compute_frechet
 except ImportError as exc:  # pragma: no cover - runtime guard
     raise SystemExit(
-        "Unable to import 'eikonal.frechet'. Build the Estuary extensions first by "
+        "Unable to import 'estuaire.frechet'. Build the Estuary extensions first by "
         "running 'python setup.py build_ext --inplace' from the project root."
     ) from exc
 
@@ -181,7 +181,7 @@ velocity_rows = velocity_matrix.toarray()
 _check_velocity_parameterisation(slowness_rows, velocity_rows)
 
 print(
-    "Validation successful: eikonal.frechet produces consistent sensitivities "
+    "Validation successful: estuaire.frechet produces consistent sensitivities "
     f"for {sources.shape[0]} sources/receivers (grid size {velocity.size})."
 )
 

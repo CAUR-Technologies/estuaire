@@ -25,7 +25,7 @@ sys.stdout = sys.stderr
 
 def buildray(arrival, velocity, events, h = 1):
     """
-    :param arrival: This is the arrival grid as calculated by an eikonal \
+    :param arrival: This is the arrival grid as calculated by an estuaire \
             solver.
     :param velocity: This is the velocity grid.
     :param event: contain the event location triplet "x,y,z"
@@ -56,7 +56,7 @@ def buildray(arrival, velocity, events, h = 1):
 
         #PB()
         finish = tuple(velocity.transform_to(evdesc))
-        rtt, ray = eikonal.bin.raytrace(arrival.data, velocity.data, start, finish,
+        rtt, ray = estuaire.bin.raytrace(arrival.data, velocity.data, start, finish,
                                         raybuffer, arrival.spacing, h=h)
 
         rays.append(ray.copy())

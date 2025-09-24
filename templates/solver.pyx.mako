@@ -5,14 +5,14 @@
 #
 # All rights reserved.
 #
-# This file contains the python interface for the eikonal
+# This file contains the python interface for the estuaire
 # solver using numpy as array container.
 #
 
 __doc__ = """
-Python interface to low level Eikonal Solver.
+Python interface to low level estuaire Solver.
 
-This module contains Seeded as well as Initial Value eikonal solver interface
+This module contains Seeded as well as Initial Value estuaire solver interface
 to low level C++ Fast Marching Solver.
 """
 

@@ -7,23 +7,23 @@
 # All rights reserved.
 #
 __doc___ = """
-This script is a n-dimensional eikonal solver from a velocity grid and seeds.
+This script is a n-dimensional estuaire solver from a velocity grid and seeds.
 
 A subgrid is integrated around the seed to ensure the curvature around the
 singulatiry is captured correctly.
 """
 
 import agstd.main as main
-import eikonal.solver as esolver
+import estuaire.solver as esolver
 import numpy as np
 import scipy as sc
 
-import eikonal.data
+import estuaire.data
 import sys
 
 import logging
 from agstd.tools import np_load
-log = logging.getLogger("Eikonal Solver")
+log = logging.getLogger("estuaire Solver")
 
 def parse_seeds(seeds):
     """
@@ -89,7 +89,7 @@ def esolve(velocity, seeds, subgrid_spacing = 10, second_order = True, spacing =
     """
     :param velocity: A velocity grid in EKImageData or simply a pickled grid.
     :param seeds: A list of tuple separated by a colon (i.e. 10,20,30:40,50,60)
-    :param second_order: Boolean determining the order of the eikonal solver \
+    :param second_order: Boolean determining the order of the estuaire solver \
             used. 1st or 2nd order.
     :param spacing: The spacing of the grid if EKImageData not used.
     :param subgrid_spacing: the spacing of the subgrid around the seeds in \
@@ -98,8 +98,8 @@ def esolve(velocity, seeds, subgrid_spacing = 10, second_order = True, spacing =
     :return: EKImageData reprenting the arrival grid.
     """
     if np.any(velocity <= 0):
-        raise ValueError("Eikonal Solver Relies On the Causality of the solution. The Velocity grid MUST be all positive values")
-    if isinstance(velocity, eikonal.data.EKImageData):
+        raise ValueError("estuaire Solver Relies On the Causality of the solution. The Velocity grid MUST be all positive values")
+    if isinstance(velocity, estuaire.data.EKImageData):
         idata = velocity
         velocity = idata.data
         spacing = idata.spacing
@@ -107,7 +107,7 @@ def esolve(velocity, seeds, subgrid_spacing = 10, second_order = True, spacing =
     else:
         if spacing is None:
             raise ValueError("argument --spacing is needed withouth a grid description")
-        idata = eikonal.data.EKImageData(velocity, spacing = spacing, origin =[0] * velocity.ndim)
+        idata = estuaire.data.EKImageData(velocity, spacing = spacing, origin =[0] * velocity.ndim)
 
     for s in seeds:
         if not check_boundary(s, velocity.shape):

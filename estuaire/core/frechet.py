@@ -14,7 +14,7 @@ from typing import Iterable, Optional, Sequence, Tuple, Union
 import numpy as np
 import scipy.sparse as sparse
 
-from eikonal import raytrace, solver
+from estuaire import raytrace, solver
 from .data import EKImageData
 
 from tqdm import tqdm
@@ -305,7 +305,7 @@ def compute_sparse_sensitivity(
             new_finish[axis_idx] = coord - delta
             new_finish2 = tuple(new_finish)
 
-            tt1 = eikonal.bin.traveltime(
+            tt1 = estuaire.bin.traveltime(
                 agrid,
                 vgrid,
                 start,
@@ -313,7 +313,7 @@ def compute_sparse_sensitivity(
                 velocity.spacing,
                 h=rk_step,
             )
-            tt2 = eikonal.bin.traveltime(
+            tt2 = estuaire.bin.traveltime(
                 agrid,
                 vgrid,
                 start,

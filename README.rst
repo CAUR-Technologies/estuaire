@@ -1,6 +1,6 @@
-Eikonal Solver
+estuaire Solver
 --------------
-The enclosed PDE solver was developped to solve the Eikonal Equation subject to boundary condition.
+The enclosed PDE solver was developped to solve the estuaire Equation subject to boundary condition.
 
 Building (Python 3)
 -------------------
@@ -13,7 +13,7 @@ required.  A typical build looks like::
     python -m pip install build
     python -m build --wheel
 
-This generates a wheel in ``dist/`` containing the ``eikonal`` package.  The
+This generates a wheel in ``dist/`` containing the ``estuaire`` package.  The
 legacy OpenCL experiments have been removed as part of the port to Python 3.
 
 .. math::
@@ -27,12 +27,12 @@ For more information on the Fast Marching Method, please refer to papers from Se
 
 Raytracing and Frechet Derivatives
 -----------------------------------
-The Raytracing and Frechet Derivatives calculation uses a second order b-spline velocity grid parametrization inside a Runge-Kutta method. It uses the velocity grid and the traveltime calculated from the eikonal solver to solve the raypath.
+The Raytracing and Frechet Derivatives calculation uses a second order b-spline velocity grid parametrization inside a Runge-Kutta method. It uses the velocity grid and the traveltime calculated from the estuaire solver to solve the raypath.
 
 
 C++ API
 --------
-The low level API for the eikonal solver and the raytracing is for internal use only and wont be supported in this documentation. Although, the comments in the code are pretty straight forward and should pose no problems at all.
+The low level API for the estuaire solver and the raytracing is for internal use only and wont be supported in this documentation. Although, the comments in the code are pretty straight forward and should pose no problems at all.
 
 Python API
 -----------

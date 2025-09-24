@@ -7,7 +7,7 @@
  * All rights reserved.
  *
  * This file contains an Implementation of the Fast Marching Method for
- * solving the Eikonal Equations. Both 1st and 2nd order  implementations
+ * solving the estuaire Equations. Both 1st and 2nd order  implementations
  * are provided and are functionnal. The 2nd is recommended since
  * more accurate for a minimal performance cost.
  *
@@ -159,7 +159,7 @@ inline double half_quadratic_solver(const agsis::vect<T, 3> &a)
     return (-a[1] + SIDE * root) / (2 * a[0]);
 }
 
-// This method solves the Eikonal Equation at the given position in the
+// This method solves the estuaire Equation at the given position in the
 // viscosity grid using the upwind scheme. This method do not explicitly check
 // for boundaries so make sure the position is at least far enough from the
 // boundaries as need by the given differencing operator. There are two
@@ -258,7 +258,7 @@ void FMM_UpwindSolve(const std::size_t index,
 
 
 % for order in ["First", "Second"]:
-// This method calculate the solution of the eikonal equation for the given
+// This method calculate the solution of the estuaire equation for the given
 // velocity grid. For the sake of optimization, the arrival grid should be
 // pre-filled with infinity value. The tag array should also have boundaries
 // pre-setted to known.
@@ -364,7 +364,7 @@ void FMM_${order}Order(const ArrayDescriptor <agsis::vect<double, D>, 1, BC> &se
 
     // The actual solver, We loop until there is no node left in the narrow
     // band
-    ${eikonal_update(order = order)}
+    ${estuaire_update(order = order)}
 }
 
 template<typename T, std::size_t D, bool BC>
@@ -388,7 +388,7 @@ void IFMM_${order}Order(ArrayDescriptor<MarchingTag, D, BC> &tag,
 
     // The actual solver, We loop until there is no node left in the narrow
     // band
-    ${eikonal_update(order = order)}
+    ${estuaire_update(order = order)}
 
 }
 
@@ -423,7 +423,7 @@ void inline IFMM${i}(ArrayDescriptor<MarchingTag, D, BC> &tag,
 
 #endif // SOLVER_HPP
 
-<%def name="eikonal_update(order = 'Second')">
+<%def name="estuaire_update(order = 'Second')">
     typename emultimap<T, size_t >::iterator it = band.begin();
     while(it != band.end())
     {

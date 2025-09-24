@@ -12,7 +12,7 @@ import agstd.main as main
 
 from agstd.tools import np_load
 
-import eikonal.solver as esolver
+import estuaire.solver as esolver
 
 import sys
 

@@ -77,10 +77,10 @@ $(BUILDDIR)/include/%.hpp: $(TEMPLATES_DIR)/%.hpp.mako | venv
 	@mkdir -p $(BUILDDIR)/include
 	$(RENDERER) $< > $@
 
-$(BUILDDIR)/%.pyx: $(TEMPLATES_DIR)/%.pyx.mako $(SRCDIR)/eikonal/%.pxd | venv
-	@mkdir -p $(BUILDDIR)/eikonal
-	@touch $(BUILDDIR)/eikonal/__init__.py
-	@cp $(SRCDIR)/eikonal/*.pxd $(BUILDDIR)/eikonal/
+$(BUILDDIR)/%.pyx: $(TEMPLATES_DIR)/%.pyx.mako $(SRCDIR)/estuaire/%.pxd | venv
+	@mkdir -p $(BUILDDIR)/estuaire
+	@touch $(BUILDDIR)/estuaire/__init__.py
+	@cp $(SRCDIR)/estuaire/*.pxd $(BUILDDIR)/estuaire/
 	$(RENDERER) $< > $@
 
 # ---- Python package build/install (PEP 517 isolation) ---------------------

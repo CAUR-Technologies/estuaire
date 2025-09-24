@@ -2,7 +2,7 @@ FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV SITE_DIR='/estuary/src/estuaire/site_scons'
-ENV PATH=$PATH:'/estuary/src/eikonal-ng/bin'
+ENV PATH=$PATH:'/estuary/src/estuaire-ng/bin'
 ENV PYTHONPATH=$PYTHONPATH:'/estuary/src/agstd':$SITE_DIR
 
 COPY . /estuary
@@ -20,7 +20,7 @@ RUN apt update \
     && pip install cython \
     && pip install mako numpy scipy \
     && pip install scons dateutils matplotlib tqdm pathlib \
-    && cd /estuary/src/eikonal && make clean && make \
+    && cd /estuary/src/estuaire && make clean && make \
     && python setup.py install
 
 

@@ -1,8 +1,8 @@
 import numpy as np
 from scipy import sparse
 
-from eikonal.data import EKEventTable, EKImageData, EKStationTable, EKTTTable
-from eikonal.frechet import compute_sparse_sensitivity
+from estuaire.data import EKEventTable, EKImageData, EKStationTable, EKTTTable
+from estuaire.frechet import compute_sparse_sensitivity
 
 
 def _velocity_grid(shape=(11, 11), velocity=3.0):
