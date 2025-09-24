@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=69", "wheel", "Cython>=3.0", "numpy>=1.26", "Mako>=1.3"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "eikonal"
+version = "0.1.0"
+description = "Fast marching eikonal solver with ray tracing"
+authors = [{ name = "J.-P. Mercier" }]
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.setuptools.package-data]
+"eikonal" = ["**/*.pxd", "**/*.pyi", "**/*.hpp"]
+
+[tool.setuptools.exclude-package-data]
+"eikonal" = ["**/*.hpp.mako", "**/*.pyx.mako", "**/*.pxd.mako"]
+

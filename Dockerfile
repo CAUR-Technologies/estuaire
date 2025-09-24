@@ -20,7 +20,7 @@ RUN apt update \
     && pip install cython \
     && pip install mako numpy scipy \
     && pip install scons dateutils matplotlib tqdm pathlib \
-    && cd /estuary/src/eikonal-ng && make clean && make \
+    && cd /estuary/src/eikonal && make clean && make \
     && python setup.py install
 
 

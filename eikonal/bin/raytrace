@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+#
+# @Author : Jean-Pascal Mercier <jean-pascal.mercier@agsis.com>
+#
+# @Copyright (C) 2010 Jean-Pascal Mercier
+#
+# All rights reserved.
+#
+__doc__ = """
+This script compute the rays from a list of event to a particular station.
+
+"""
+
+import agstd.main as main
+
+import numpy as np
+
+from agstd.tools import np_load
+
+import sys
+
+sys.stdout = sys.stderr
+
+
+def buildray(arrival, velocity, traveltime, h = 1):
+    """
+    :param arrival: This is the arrival grid as calculated by an eikonal \
+            solver.
+    :param velocity: This is the velocity grid.
+    :param traveltime: Traveltime Table.
+    :param h: The step of the RK integration Scheme.
+    """
+    h = 1 if h is None else float(h)
+
+    if not (velocity.check_compatibility(arrival)):
+        raise ValueError("arrival Velocity and Velocity must have same" \
+                         "origin, spacing and shape")
+
+    tttable = traveltime
+    stdesc = tttable.station_row
+
+
+    start = tuple(velocity.transform_to(stdesc['position'][:arrival.data.ndim]))
+    current_events = tttable.event_rows
+
+    max_len = np.sqrt(np.sum(np.array(velocity.data.shape) ** 2))
+
+    raybuffer = np.empty((int(max_len * (8.0 / h)), len(velocity.data.shape)),
+                         dtype='float64')
+
+    rays = []
+    r = []
+
+    for i, evdesc in enumerate(current_events):
+        finish = tuple(velocity.transform_to(evdesc['position'][:arrival.data.ndim]))
+        rtt, ray = eikonal.bin.raytrace(arrival.data, velocity.data, start, finish,
+                                        raybuffer, arrival.spacing, h = h)
+        tt = tttable.data['traveltime'][i] - stdesc['delta_t'] + evdesc['delta_t']
+        ri = (tt - rtt)
+
+        rays.append(ray.copy())
+        r.append(ri)
+
+
+    return dict(rays = rays, residuals = r,
+                event_id = current_events['id'], station_id = tttable.station_id)
+
+
+if __name__ == "__main__":
+    main.main(buildray, spacing = float, arrival = np_load,
+              velocity = np_load, traveltime = np_load)
