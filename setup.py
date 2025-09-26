@@ -62,7 +62,7 @@ def ensure_generated_sources() -> None:
 COMMON_ARGS = {
     "include_dirs": [str(INCLUDE_DIR)],
     "language": "c++",
-    "extra_compile_args": ["-Wno-unused-function"],
+    "extra_compile_args": ["-std=c++14", "-Wno-unused-function"],
     # "extra_link_args": ["-stdlib=libc++"],
     "extra_link_args": [],
 }

@@ -21,6 +21,7 @@ from tqdm import tqdm
 
 ArrayLike = Union[Sequence[float], np.ndarray]
 
+
 def compute_frechet(
     velocity: Union[EKImageData, np.ndarray],
     sources: ArrayLike,
@@ -58,12 +59,12 @@ def compute_frechet(
     frechet : scipy.sparse.csr_matrix or ndarray
         Sparse matrix with one row per source/receiver combination. The optional
         ``original_shape`` attribute stores the ``(n_sources, n_receivers)``
-        layout when ``pairwise`` is ``False``. When ``return_dense=True`` a dense
-        array with the same ordering as the original helper is produced instead.
+        layout when ``pairwise`` is ``False``. When ``return_dense=True`` a
+        dense array with the same ordering as the original helper is produced
+        instead.
     travel_times : ndarray, optional
         Returned when ``return_travel_times`` is ``True``.
     """
-
     grid = _ensure_grid(velocity, spacing=spacing, origin=origin)
 
     vel_data = np.require(grid.data, dtype=np.float64, requirements=("C",))
@@ -86,7 +87,9 @@ def compute_frechet(
     _validate_points(rcv_grid, vel_data.shape, "receiver")
 
     if pairwise and src_grid.shape[0] != rcv_grid.shape[0]:
-        raise ValueError("pairwise=True requires the same number of sources and receivers.")
+        raise ValueError(
+            "pairwise=True requires the same number of sources and receivers."
+        )
 
     n_sources = src_grid.shape[0]
     n_receivers = rcv_grid.shape[0]
@@ -107,7 +110,9 @@ def compute_frechet(
     velocity_flat = vel_data.ravel(order="C")
     velocity_flat_sq = velocity_flat * velocity_flat
 
-    max_len = np.linalg.norm(np.asarray(vel_data.shape, dtype=np.float64)) * (4 ** dims)
+    max_len = np.linalg.norm(np.asarray(vel_data.shape, dtype=np.float64)) * (
+        4 ** dims
+    )
     rk_step = float(rk_step)
     if rk_step <= 0:
         raise ValueError("rk_step must be strictly positive.")
@@ -150,11 +155,10 @@ def compute_frechet(
             if indices_vals.size == 0:
                 indptr.append(indptr[-1])
                 row_counter += 1
-                if pairwise:
-                    if travel is not None:
+                if travel is not None:
+                    if pairwise:
                         travel[src_idx] = tt_val
-                else:
-                    if travel is not None:
+                    else:
                         travel[src_idx, rcv_idx] = tt_val
                 continue
 
@@ -176,11 +180,10 @@ def compute_frechet(
             indptr.append(indptr[-1] + weights_nonzero.size)
             row_counter += 1
 
-            if pairwise:
-                if travel is not None:
+            if travel is not None:
+                if pairwise:
                     travel[src_idx] = tt_val
-            else:
-                if travel is not None:
+                else:
                     travel[src_idx, rcv_idx] = tt_val
 
     while row_counter < n_rows:
@@ -190,35 +193,38 @@ def compute_frechet(
     indices_array = np.array(index_entries, dtype=np.int32)
     data_array = np.array(data_entries, dtype=dtype)
     indptr_array = np.array(indptr, dtype=np.int32)
-    matrix_unique = sparse.csr_matrix((data_array, indices_array, indptr_array), shape=(n_rows, n_cells))
+
+    matrix = sparse.csr_matrix(
+        (data_array, indices_array, indptr_array),
+        shape=(n_rows, n_cells),
+    )
 
     if pairwise:
-        matrix_unique.original_shape = (n_sources,)
+        matrix.original_shape = (n_sources,)
         if return_dense:
-            frechet_output = matrix_unique.toarray()
+            frechet_output = matrix.toarray()
         else:
-            frechet_output = matrix_unique
+            frechet_output = matrix
         if travel is not None:
             return frechet_output, travel
         return frechet_output
 
-    n_unique_sources = unique_src_coords.shape[0]
-    n_unique_receivers = unique_rcv_coords.shape[0]
-    row_indices = (
-        src_inverse[:, None] * n_unique_receivers + rcv_inverse[None, :]
-    ).reshape(-1)
-    matrix_out = matrix_unique[row_indices, :]
-    matrix_out.original_shape = (n_sources, n_receivers)
+    # Non-pairwise: rows are in src-major order with rcv varying fastest.
+    matrix.original_shape = (n_sources, n_receivers)
 
     if return_dense:
-        frechet_output = matrix_out.toarray().reshape(n_sources, n_receivers, n_cells)
+        frechet_output = matrix.toarray().reshape(n_sources, n_receivers, n_cells)
     else:
-        frechet_output = matrix_out
+        frechet_output = matrix
 
     if travel is not None:
-        travel_output = travel[src_inverse][:, rcv_inverse]
-        return frechet_output, travel_output
+        return frechet_output, travel
     return frechet_output
+
+
+
+
+
 def compute_sparse_sensitivity(
     arrival,
     velocity,
