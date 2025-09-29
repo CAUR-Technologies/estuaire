@@ -2,7 +2,7 @@ name: Build wheels (cp311)
 
 on:
   push:
-    branches: [ test-wheels ]
+    branches: [ test-wheels ] 
     # tags: [ 'v*' ]
   pull_request:
   workflow_dispatch:
